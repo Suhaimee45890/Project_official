@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:project_official/app/view/home.dart' hide Preview;
+import 'package:project_official/app/view/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,57 +13,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "HalalPro",
-      home: Home(),
+    return GetMaterialApp(
+      title: "Selalmat",
       debugShowCheckedModeBanner: false,
+      initialRoute: "/",
+      getPages: [
+        GetPage(name: "/", page: () => Title1()),
+        GetPage(name: "/login", page: () => Login()),
+      ],
     );
   }
 }
-
-class Home extends StatefulWidget {
-  const Home({super.key});
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Project", style: TextStyle(color: Colors.red)),
-      ),
-      body: Container(
-        color: Colors.amberAccent,
-        height: 200,
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-      ),
-    );
-  }
-}
-
-// Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: TextField(
-//               decoration: InputDecoration(
-//                 border: OutlineInputBorder(),
-//                 hint: Text('email'),
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: TextField(
-//               decoration: InputDecoration(
-//                 border: OutlineInputBorder(),
-//                 hint: Text('password'),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
