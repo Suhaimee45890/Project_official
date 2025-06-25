@@ -31,12 +31,35 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text("Project", style: TextStyle(color: Colors.red)),
       ),
-      body: TextField(
-        decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          hint: Text('email'),
-        ),
+      body: Container(
+        color: Colors.amberAccent,
+        height: 200,
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       ),
     );
   }
 }
+
+// Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: TextField(
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(),
+//                 hint: Text('email'),
+//               ),
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: TextField(
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(),
+//                 hint: Text('password'),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
