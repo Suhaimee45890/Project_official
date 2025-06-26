@@ -1,7 +1,9 @@
 // ignore_for_file: dead_code
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_official/app/view/home.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -44,13 +46,9 @@ class _RegisterState extends State<Register> {
 
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.amber,
-                  const Color.fromARGB(255, 167, 21, 21),
-                  Colors.black,
-                ],
+                colors: [Colors.red, Colors.amber],
+                end: Alignment.centerRight,
                 begin: Alignment.topLeft,
-                end: Alignment.bottomLeft,
               ),
             ),
           ),
@@ -114,11 +112,19 @@ class _RegisterState extends State<Register> {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 680,
+                    height: 600,
 
                     /// Yellow container edit
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white,
+                          const Color.fromARGB(255, 221, 221, 221),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(50),
                         topRight: Radius.circular(50),
@@ -245,6 +251,30 @@ class _RegisterState extends State<Register> {
                                 suffixIcon: Icon(Icons.calendar_today),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Home()),
+                              );
+                            },
+
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Sign In",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),

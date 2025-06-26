@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:project_official/app/view/home.dart';
 import 'package:project_official/app/view/titile1.dart' hide Preview;
 import 'package:project_official/app/view/login.dart';
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: "/", page: () => Title1()),
         GetPage(name: "/login", page: () => Login()),
-        GetPage(name: "/", page: () => Login()),
+        GetPage(name: "/Home", page: () => Home()),
       ],
     );
   }

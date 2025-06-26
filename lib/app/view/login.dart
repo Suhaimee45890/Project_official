@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:project_official/app/view/home.dart';
 import 'package:project_official/app/view/register.dart';
 
 class Login extends StatefulWidget {
@@ -94,15 +96,33 @@ class _LoginState extends State<Login> {
                             Column(
                               children: [
                                 Text(
-                                  "You can scan snd check the  halal product ",
+                                  "Welcome Back!",
+
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black),
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 Text(
-                                  "via this app directly and confidence !",
+                                  "Please sign in to continue."
+                                  "",
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black),
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                                // Text(
+                                //   "via this app directly and confidence !",
+                                //   textAlign: TextAlign.center,
+                                //   style: TextStyle(
+                                //     color: Colors.black,
+                                //     fontSize: 20,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ],
@@ -160,7 +180,7 @@ class _LoginState extends State<Login> {
                           backgroundColor: Colors.black,
                         ),
                         onPressed: () {
-                          Get.toNamed("/"); // <-- ใช้ GetX
+                          Get.toNamed("/Home"); // <-- ใช้ GetX
                         },
                         child: Text(
                           "Login ",

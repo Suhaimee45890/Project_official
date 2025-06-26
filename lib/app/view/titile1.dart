@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:project_official/app/view/decoration/barcode.dart';
 
 class Title1 extends StatefulWidget {
@@ -67,22 +68,50 @@ class _Title1 extends State<Title1> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: 80),
+                        SizedBox(height: 60),
                         Text(
-                          "Scan Halal Product !",
+                          "What you gonna do!",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         Text(
-                          "scan your product !",
+                          "Scan your Halal Product ?",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20, color: Colors.black),
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            // fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
+                        Text(
+                          "Check your Prayer Time ?",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            // fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Text(
+                          "Check The Qiblat ?",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            // fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        // Text(
+                        //   "scan your product !",
+                        //   textAlign: TextAlign.center,
+                        //   style: TextStyle(fontSize: 20, color: Colors.black),
+                        // ),
                         SizedBox(height: 10),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -94,7 +123,11 @@ class _Title1 extends State<Title1> {
                           },
                           child: Text(
                             "Let’s Start >",
-                            style: TextStyle(fontSize: 25, color: Colors.black),
+                            style: GoogleFonts.poppins(
+                              fontSize: 25,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
