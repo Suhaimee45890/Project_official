@@ -9,7 +9,7 @@ class BarcodeScanner extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 200),
+          SizedBox(height: 150),
           Container(
             height: 300,
             width: 300,
