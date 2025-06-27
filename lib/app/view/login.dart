@@ -180,7 +180,7 @@ class _LoginState extends State<Login> {
                           backgroundColor: Colors.black,
                         ),
                         onPressed: () {
-                          Get.toNamed("/Home"); // <-- ใช้ GetX
+                          Get.toNamed("/frame"); // <-- ใช้ GetX
                         },
                         child: Text(
                           "Login ",

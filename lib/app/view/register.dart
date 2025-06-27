@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:project_official/app/view/home.dart';
+import 'package:project_official/app/view/frame.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -263,7 +263,9 @@ class _RegisterState extends State<Register> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Home()),
+                                MaterialPageRoute(
+                                  builder: (context) => Frame(),
+                                ),
                               );
                             },
 

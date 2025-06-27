@@ -11,98 +11,75 @@ class Account extends StatefulWidget {
 class _AState extends State<Account> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text("Account")));
-  }
-}
-
-Widget _buildAccountPage() {
-  return Stack(
-    children: [
-      Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.amber, const Color.fromARGB(255, 252, 99, 43)],
-            begin: Alignment.topLeft,
-            end: Alignment.topCenter,
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Account', style: GoogleFonts.poppins()),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        centerTitle: true,
       ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 750,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
-                  ),
+      backgroundColor: Colors.grey.shade100,
+      body: SafeArea(
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 60,
+              backgroundImage: AssetImage('assets/images/profile.jpg'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'John Doe',
+              style: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'johndoe@example.com',
+              style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[700]),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.edit),
+              label: Text("Edit Profile"),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            SizedBox(height: 30),
+            ListTile(
+              leading: Icon(Icons.phone),
+              title: Text("Phone", style: GoogleFonts.poppins()),
+              subtitle: Text("+66 812345678", style: GoogleFonts.poppins()),
+            ),
+            ListTile(
+              leading: Icon(Icons.cake),
+              title: Text("Birthday", style: GoogleFonts.poppins()),
+              subtitle: Text("January 1, 1990", style: GoogleFonts.poppins()),
+            ),
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: ElevatedButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.logout),
+                label: Text("Logout"),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
                 ),
               ),
-              Column(
-                children: [
-                  SizedBox(height: 30),
-                  Center(
-                    child: Text(
-                      "Our Services",
-                      style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 70),
-                  _buildServiceItem("Halal Scanner", "/halal"),
-                  SizedBox(height: 70),
-                  _buildServiceItem("Prayer Time", "/prayerTime"),
-                  SizedBox(height: 70),
-                  _buildServiceItem("Compass", "/compass"),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
-Widget _buildServiceItem(String label, String route) {
-  return Column(
-    children: [
-      Text(
-        label,
-        style: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 10),
-      InkWell(
-        onTap: () {},
-        child: Container(
-          height: 50,
-          width: 200,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(" Icon ", style: GoogleFonts.poppins(color: Colors.white)),
-                SizedBox(width: 10),
-                Text(label, style: GoogleFonts.poppins(color: Colors.white)),
-              ],
             ),
-          ),
+          ],
         ),
       ),
-    ],
-  );
+    );
+  }
 }
