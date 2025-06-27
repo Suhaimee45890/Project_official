@@ -56,12 +56,12 @@ class _RegisterState extends State<Register> {
             mainAxisAlignment: MainAxisAlignment.start,
 
             children: [
-              SizedBox(height: 90),
+              SizedBox(height: 150),
 
               ///Title edit let sign you in
               Center(
                 child: Text(
-                  'Let’s Sign you in',
+                  'Let’s Signd you in',
                   style: GoogleFonts.poppins(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

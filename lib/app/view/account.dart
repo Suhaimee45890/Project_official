@@ -73,11 +73,7 @@ class _AState extends State<Account> {
                   Get.toNamed("/login");
                 },
                 icon: Icon(Icons.logout),
-<<<<<<< HEAD
-                label: Text("New Account"),
-=======
                 label: Text("new Login"),
->>>>>>> 7e6d58d885c4fce0aca87463c90cf9ce52bcd8b2
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   backgroundColor: Colors.redAccent,
