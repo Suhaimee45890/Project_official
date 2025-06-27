@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Setting extends StatefulWidget {
@@ -47,7 +48,9 @@ class _SettingState extends State<Setting> {
             ListTile(
               leading: Icon(Icons.logout),
               title: Text("Logout", style: GoogleFonts.poppins()),
-              onTap: () {},
+              onTap: () {
+                Get.toNamed("/");
+              },
             ),
           ],
         ),

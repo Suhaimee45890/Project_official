@@ -14,7 +14,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home', style: GoogleFonts.poppins()),
+        title: Text('Our Services', style: GoogleFonts.poppins()),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -34,10 +34,10 @@ class _HomeState extends State<Home> {
               ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Stack(
             children: [
-              Stack(
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
                     width: double.infinity,
@@ -45,32 +45,32 @@ class _HomeState extends State<Home> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
                       ),
                     ),
                   ),
-                  Column(
-                    children: [
-                      SizedBox(height: 80),
-                      Center(
-                        child: Text(
-                          "Our Services",
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                ],
+              ),
+              Column(
+                children: [
+                  SizedBox(height: 200),
+                  Center(
+                    child: Text(
+                      "Select Services",
+                      style: GoogleFonts.poppins(
+                        color: Colors.black,
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(height: 70),
-                      _buildServiceItem("Halal Scanner", "/scanner"),
-                      SizedBox(height: 70),
-                      _buildServiceItem("Prayer Time", "/prayerTime"),
-                      SizedBox(height: 70),
-                      _buildServiceItem("Compass", "/compass"),
-                    ],
+                    ),
                   ),
+                  SizedBox(height: 70),
+                  _buildServiceItem("Halal Scanner", "/scanner"),
+                  SizedBox(height: 70),
+                  _buildServiceItem("Prayer Time", "/prayerTime"),
+                  SizedBox(height: 70),
+                  _buildServiceItem("Compass", "/compass"),
                 ],
               ),
             ],

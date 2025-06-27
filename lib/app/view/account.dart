@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Account extends StatefulWidget {
@@ -23,6 +24,7 @@ class _AState extends State<Account> {
       body: SafeArea(
         child: Column(
           children: [
+            SizedBox(height: 30),
             CircleAvatar(
               radius: 60,
               backgroundImage: AssetImage('assets/images/profile.jpg'),
@@ -67,9 +69,11 @@ class _AState extends State<Account> {
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Get.toNamed("/login");
+                },
                 icon: Icon(Icons.logout),
-                label: Text("Logout"),
+                label: Text("New Account"),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   backgroundColor: Colors.redAccent,
