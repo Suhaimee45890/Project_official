@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bottom_bar/bottom_bar.dart';
 
@@ -18,7 +19,10 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        onPageChanged: (index) => setState(() => _currentPage = index),
+        onPageChanged: (index) {
+          setState(() => _currentPage = index);
+          print("Page changed to index: $index");
+        },
         children: [_buildAccountPage(), _buildHomePage(), _buildSettingsPage()],
       ),
       bottomNavigationBar: BottomBar(
@@ -26,6 +30,7 @@ class _HomeState extends State<Home> {
         onTap: (int index) {
           _pageController.jumpToPage(index);
           setState(() => _currentPage = index);
+          print("Bottom bar tapped: $index");
         },
         items: <BottomBarItem>[
           BottomBarItem(
@@ -48,7 +53,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  ///Account page ;
+  /// Account page
   Widget _buildAccountPage() {
     return Scaffold(
       appBar: AppBar(
@@ -122,7 +127,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  ///Home page ;
+  /// Home page
   Widget _buildHomePage() {
     return Scaffold(
       appBar: AppBar(
@@ -176,7 +181,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       SizedBox(height: 70),
-                      _buildServiceItem("Halal Scanner", "/halal"),
+                      _buildServiceItem("Halal Scanner", "/scanner"),
                       SizedBox(height: 70),
                       _buildServiceItem("Prayer Time", "/prayerTime"),
                       SizedBox(height: 70),
@@ -192,7 +197,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  /// page ;
+  /// Service item widget with navigation
   Widget _buildServiceItem(String label, String route) {
     return Column(
       children: [
@@ -203,7 +208,8 @@ class _HomeState extends State<Home> {
         SizedBox(height: 10),
         InkWell(
           onTap: () {
-            Navigator.pushNamed(context, route);
+            print(route);
+            Get.toNamed(route);
           },
           child: Container(
             height: 50,
@@ -216,6 +222,7 @@ class _HomeState extends State<Home> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // You can replace this Text "Icon" with an actual Icon widget if you want
                   Text(
                     " Icon ",
                     style: GoogleFonts.poppins(color: Colors.white),
@@ -231,7 +238,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  ///Setting page ;
+  /// Settings page
   Widget _buildSettingsPage() {
     return Scaffold(
       appBar: AppBar(
