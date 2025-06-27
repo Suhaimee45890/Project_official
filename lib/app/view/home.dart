@@ -14,6 +14,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // automaticallyImplyLeading: false,
         title: Text('Home', style: GoogleFonts.poppins()),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
