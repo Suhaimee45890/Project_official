@@ -67,7 +67,7 @@ class _LoginState extends State<Login> {
               Stack(
                 children: [
                   Container(
-                    height: 450,
+                    height: 600,
                     width: double.infinity,
 
                     decoration: BoxDecoration(
@@ -187,7 +187,79 @@ class _LoginState extends State<Login> {
                           style: TextStyle(fontSize: 25, color: Colors.white),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20),
+                      Text(
+                        "or continue with",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Google login
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              20,
+                            ), // กำหนดมุมโค้ง
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed("/");
+                              },
+                              child: Image.asset(
+                                'assets/images/Google.jpg',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit
+                                    .cover, // ทำให้รูปภาพเต็มพื้นที่และไม่เบี้ยว
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              20,
+                            ), // กำหนดมุมโค้ง
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed("/");
+                              },
+                              child: Image.asset(
+                                'assets/images/X.jpeg',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit
+                                    .cover, // ทำให้รูปภาพเต็มพื้นที่และไม่เบี้ยว
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20),
+
+                          // Facebook login
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              20,
+                            ), // กำหนดมุมโค้ง
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed("/");
+                              },
+                              child: Image.asset(
+                                'assets/images/faceboook.jpg',
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit
+                                    .cover, // ทำให้รูปภาพเต็มพื้นที่และไม่เบี้ยว
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 20),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(

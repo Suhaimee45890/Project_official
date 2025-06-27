@@ -111,7 +111,7 @@ class _RegisterState extends State<Register> {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 600,
+                    height: 650,
 
                     /// Yellow container edit
                     decoration: BoxDecoration(
