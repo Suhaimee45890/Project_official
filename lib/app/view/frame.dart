@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:bottom_bar/bottom_bar.dart';
 import 'package:project_official/app/view/account.dart';
 import 'package:project_official/app/view/home.dart';
 import 'package:project_official/app/view/setting.dart';
@@ -13,35 +12,55 @@ class Frame extends StatefulWidget {
 
 class _HomeState extends State<Frame> {
   int pageIndex = 1;
-  List page = [Account(), Home(), Setting()];
+
+  final List<Widget> page = [const Account(), const Home(), const Setting()];
+
   @override
   Widget build(BuildContext context) {
+    final Color navBgColor =
+        Theme.of(context).appBarTheme.backgroundColor ?? Colors.white;
+    final Color navTextColor =
+        Theme.of(context).appBarTheme.foregroundColor ?? Colors.black;
+
     return Scaffold(
       body: page[pageIndex],
-      bottomNavigationBar: BottomBar(
-        selectedIndex: pageIndex,
-        onTap: (int value) {
-          pageIndex = value;
-          setState(() {});
-          print(value);
-        },
-        items: <BottomBarItem>[
-          BottomBarItem(
-            icon: Icon(Icons.person),
-            title: Text('Account'),
-            activeColor: Colors.black,
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          backgroundColor: navBgColor,
+          indicatorColor: navTextColor.withOpacity(0.1),
+          labelTextStyle: MaterialStateProperty.all(
+            TextStyle(color: navTextColor),
           ),
-          BottomBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
-            activeColor: Colors.black,
+          iconTheme: MaterialStateProperty.all(
+            IconThemeData(color: navTextColor),
           ),
-          BottomBarItem(
-            icon: Icon(Icons.settings),
-            title: Text('Settings'),
-            activeColor: Colors.black,
-          ),
-        ],
+        ),
+        child: NavigationBar(
+          selectedIndex: pageIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              pageIndex = index;
+            });
+          },
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person),
+              label: 'Account',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+        ),
       ),
     );
   }

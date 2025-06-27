@@ -27,7 +27,7 @@ class _AState extends State<Account> {
             SizedBox(height: 30),
             CircleAvatar(
               radius: 60,
-              backgroundImage: AssetImage('assets/images/profile.jpg'),
+              backgroundImage: AssetImage('assets/images/profile.jpeg'),
             ),
             SizedBox(height: 20),
             Text(
@@ -38,7 +38,7 @@ class _AState extends State<Account> {
               ),
             ),
             Text(
-              'johndoe@example.com',
+              'Siaberm@gmail.com',
               style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[700]),
             ),
             SizedBox(height: 20),

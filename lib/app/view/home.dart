@@ -1,121 +1,117 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: Text('Our Services', style: GoogleFonts.poppins()),
-
-        // automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        elevation: 0,
+        title: const Text(
+          "Our Services",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          ),
+        ),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange, Colors.deepOrange],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        elevation: 0,
       ),
-      extendBodyBehindAppBar: true,
-      body: Stack(
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.amber, const Color.fromARGB(255, 252, 99, 43)],
-                begin: Alignment.topLeft,
-                end: Alignment.topCenter,
+          Center(
+            child: Text(
+              "Select Services",
+              style: GoogleFonts.poppins(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          Stack(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 750,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  SizedBox(height: 200),
-                  Center(
-                    child: Text(
-                      "Select Services",
-                      style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 70),
-                  _buildServiceItem("Halal Scanner", "/scanner"),
-                  SizedBox(height: 70),
-                  _buildServiceItem("Prayer Time", "/prayerTime"),
-                  SizedBox(height: 70),
-                  _buildServiceItem("Compass", "/compass"),
-                ],
-              ),
-            ],
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "Halal Scanner",
+            icon: Icons.qr_code_scanner,
+            onTap: () => Navigator.pushNamed(context, "/scanner"),
+          ),
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "Prayer Time",
+            icon: Icons.access_time,
+            onTap: () => Navigator.pushNamed(context, "/prayerTime"),
+          ),
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "Compass",
+            icon: Icons.explore,
+            onTap: () => Navigator.pushNamed(context, "/compass"),
           ),
         ],
       ),
     );
   }
-}
 
-Widget _buildServiceItem(String label, String route) {
-  return Column(
-    children: [
-      Text(
-        label,
-        style: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 10),
-      InkWell(
-        onTap: () {
-          // print(route);
-          Get.toNamed(route);
-        },
-        child: Container(
-          height: 50,
-          width: 200,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // You can replace this Text "Icon" with an actual Icon widget if you want
-                Text(" Icon ", style: GoogleFonts.poppins(color: Colors.white)),
-                SizedBox(width: 10),
-                Text(label, style: GoogleFonts.poppins(color: Colors.white)),
-              ],
+  Widget _buildServiceCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 12,
+              offset: Offset(0, 8),
             ),
-          ),
+          ],
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.black,
+              radius: 28,
+              child: Icon(icon, color: Colors.white, size: 28),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+          ],
         ),
       ),
-    ],
-  );
+    );
+  }
 }
