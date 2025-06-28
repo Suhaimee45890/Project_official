@@ -46,6 +46,7 @@ class Home extends StatelessWidget {
           _buildServiceCard(
             context,
             title: "Halal Scanner",
+            subtitle: "สแกนฮาลาล",
             icon: Icons.qr_code_scanner,
             onTap: () => Navigator.pushNamed(context, "/scanner"),
           ),
@@ -53,6 +54,7 @@ class Home extends StatelessWidget {
           _buildServiceCard(
             context,
             title: "Prayer Time",
+            subtitle: "เวลาละหมาด",
             icon: Icons.access_time,
             onTap: () => Navigator.pushNamed(context, "/prayerTime"),
           ),
@@ -60,6 +62,7 @@ class Home extends StatelessWidget {
           _buildServiceCard(
             context,
             title: "Compass",
+            subtitle: "เข็มทิศหากิบลัต",
             icon: Icons.explore,
             onTap: () => Navigator.pushNamed(context, "/compass"),
           ),
@@ -71,6 +74,7 @@ class Home extends StatelessWidget {
   Widget _buildServiceCard(
     BuildContext context, {
     required String title,
+    required String subtitle,
     required IconData icon,
     required VoidCallback onTap,
   }) {
@@ -100,12 +104,25 @@ class Home extends StatelessWidget {
             ),
             const SizedBox(width: 20),
             Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             ),
             const Icon(Icons.arrow_forward_ios, color: Colors.grey),

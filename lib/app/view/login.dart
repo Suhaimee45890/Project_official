@@ -141,7 +141,7 @@ class _LoginState extends State<Login> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            obscureText: true,
+                            obscureText: false,
                           ),
                         ),
                       ),
