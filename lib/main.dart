@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: "/frame", page: () => Frame()),
         GetPage(name: "/scanner", page: () => Scanner()),
         GetPage(name: "/prayerTime", page: () => PrayerTime()),
-        GetPage(name: "/compass", page: () => Compass()),
+        GetPage(name: "/compass", page: () => CompassPage()),
         GetPage(name: "/setting", page: () => Setting()),
       ],
     );

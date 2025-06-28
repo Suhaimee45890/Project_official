@@ -8,8 +8,12 @@ class PrayerTime extends StatefulWidget {
   State<PrayerTime> createState() => _PrayerTimeState();
 }
 
-class _PrayerTimeState extends State<PrayerTime> {
+class _PrayerTimeState extends State<PrayerTime>
+    with SingleTickerProviderStateMixin {
   int currentDayIndex = 0;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
   final List<Map<String, String>> prayerTimesList = [
     {
       'day': 'Today',
@@ -42,6 +46,26 @@ class _PrayerTimeState extends State<PrayerTime> {
       currentDayIndex = (currentDayIndex + direction) % prayerTimesList.length;
       if (currentDayIndex < 0) currentDayIndex += prayerTimesList.length;
     });
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,6 +106,7 @@ class _PrayerTimeState extends State<PrayerTime> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // วันที่
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -107,10 +132,11 @@ class _PrayerTimeState extends State<PrayerTime> {
                     ),
                   ),
                   const SizedBox(height: 10),
+
+                  // กล่องเวลา
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     padding: const EdgeInsets.all(20),
-                    width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(20),
@@ -123,7 +149,6 @@ class _PrayerTimeState extends State<PrayerTime> {
                       ],
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Prayer Time",
@@ -134,15 +159,20 @@ class _PrayerTimeState extends State<PrayerTime> {
                           ),
                         ),
                         const SizedBox(height: 20),
+
+                        // ปุ่มเลือกวัน
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             GestureDetector(
                               onTap: () => _changeDay(-1),
-                              child: const Icon(
-                                Icons.arrow_back_ios,
-                                color: Colors.white,
-                                size: 30,
+                              child: ScaleTransition(
+                                scale: _scaleAnimation,
+                                child: const Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
                               ),
                             ),
                             Text(
@@ -154,15 +184,21 @@ class _PrayerTimeState extends State<PrayerTime> {
                             ),
                             GestureDetector(
                               onTap: () => _changeDay(1),
-                              child: const Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.white,
-                                size: 30,
+                              child: ScaleTransition(
+                                scale: _scaleAnimation,
+                                child: const Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
                               ),
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 20),
+
+                        // แสดงเวลาละหมาด
                         ...["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((
                           name,
                         ) {
@@ -196,12 +232,14 @@ class _PrayerTimeState extends State<PrayerTime> {
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 30),
+
+                  // กล่องอธิบาย
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(15),
@@ -230,6 +268,7 @@ class _PrayerTimeState extends State<PrayerTime> {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 50),
                 ],
               ),
