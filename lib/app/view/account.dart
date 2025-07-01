@@ -66,21 +66,6 @@ class _AState extends State<Account> {
               subtitle: Text("January 1, 1990", style: GoogleFonts.poppins()),
             ),
             Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Get.toNamed("/login");
-                },
-                icon: Icon(Icons.logout),
-                label: Text("new Login"),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
           ],
         ),
       ),

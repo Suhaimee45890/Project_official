@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_official/storage/storage.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -60,8 +63,11 @@ class _SettingState extends State<Setting> {
             ListTile(
               leading: Icon(Icons.logout),
               title: Text("Logout", style: GoogleFonts.poppins()),
-              onTap: () {
-                Get.toNamed("/");
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Storage().storageBox.remove("userId");
+                Storage().storageBox.remove("isLogin");
+                Get.offAllNamed("/");
               },
             ),
           ],

@@ -1,14 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_official/app/view/register.dart';
+import 'package:project_official/storage/storage.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
+}
+
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passWordlController = TextEditingController();
+
+Future<void> login() async {
+  try {
+    final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passWordlController.text.trim(),
+    );
+    Storage().saveData(user.user?.uid ?? "");
+    Get.offAllNamed("/frame"); // ✅ เปลี่ยนหน้าและล้าง history
+  } on FirebaseException catch (e) {
+    String message = "";
+    if (e.code == "user-not-found") {
+      message = "No user found for that email";
+    } else if (e.code == "wrong-password") {
+      message = "Wrong Password";
+    } else {
+      message = e.message ?? "an error occurred";
+    }
+    Get.snackbar(
+      "Login Failed",
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+    );
+  }
 }
 
 class _LoginState extends State<Login> {
@@ -133,6 +163,7 @@ class _LoginState extends State<Login> {
                         padding: const EdgeInsets.all(15.0),
                         child: SizedBox(
                           child: TextField(
+                            controller: emailController,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
@@ -150,6 +181,7 @@ class _LoginState extends State<Login> {
                       Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: TextField(
+                          controller: passWordlController,
                           obscureText: _obscureText,
                           decoration: InputDecoration(
                             hintText: 'Password',
@@ -180,7 +212,7 @@ class _LoginState extends State<Login> {
                           backgroundColor: Colors.black,
                         ),
                         onPressed: () {
-                          Get.toNamed("/frame"); // <-- ใช้ GetX
+                          login();
                         },
                         child: Text(
                           "Login ",
@@ -207,7 +239,7 @@ class _LoginState extends State<Login> {
                             ), // กำหนดมุมโค้ง
                             child: InkWell(
                               onTap: () {
-                                Get.toNamed("/");
+                                login();
                               },
                               child: Image.asset(
                                 'assets/images/Google.jpg',

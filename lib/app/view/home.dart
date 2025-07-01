@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_official/storage/storage.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -65,6 +66,12 @@ class Home extends StatelessWidget {
             subtitle: "เข็มทิศหากิบลัต",
             icon: Icons.explore,
             onTap: () => Navigator.pushNamed(context, "/compass"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              print(Storage().readData());
+            },
+            child: Text("data"),
           ),
         ],
       ),

@@ -1,30 +1,33 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
 import 'package:project_official/app/view/compass.dart';
 import 'package:project_official/app/view/frame.dart';
 import 'package:project_official/app/view/prayer_time.dart';
 import 'package:project_official/app/view/scanner.dart';
-
 import 'package:project_official/app/view/titile1.dart';
 import 'package:project_official/app/view/login.dart';
 import 'package:project_official/app/view/setting.dart' hide ThemeController;
+import 'package:project_official/storage/storage.dart';
 
-void main() {
-  // ✅ ติดตั้ง controller ก่อน runApp
-  runApp(MyApp()); // ✅ เรียก MyApp
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await GetStorage.init();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "Selalmat",
       debugShowCheckedModeBanner: false,
-
-      // ✅ Theme GetX
-      initialRoute: "/",
+      home: Root(), // ✅ ตรวจสอบสถานะล็อกอิน
       getPages: [
         GetPage(name: "/", page: () => Title1()),
         GetPage(name: "/login", page: () => Login()),
@@ -35,5 +38,18 @@ class MyApp extends StatelessWidget {
         GetPage(name: "/setting", page: () => Setting()),
       ],
     );
+  }
+}
+
+class Root extends StatelessWidget {
+  const Root({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (Storage().isLogin()) {
+      return Frame();
+    } else {
+      return Title1();
+    }
   }
 }

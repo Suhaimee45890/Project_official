@@ -44,6 +44,10 @@ dependencies:
   bottom_bar: ^2.0.5
   google_nav_bar: ^5.0.7
   flutter_compass: ^0.8.1
+  firebase_core: ^3.14.0
+  firebase_auth: ^5.6.0
+  cloud_firestore: ^5.6.9
+  get_storage: ^2.1.1
 
 
 
