@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -17,7 +18,6 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -37,7 +37,12 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final scanBorderSize = MediaQuery.of(context).size.width * 0.7;
+    final screenSize = MediaQuery.of(context).size;
+    final scanBorderSize = screenSize.width * 0.7;
+    final scanTop = screenSize.height * 0.25;
+    const double scanLinePadding = 16.0;
+
+    final scanLeft = (screenSize.width - scanBorderSize) / 2;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -61,43 +66,106 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                     this.barcode = barcode.rawValue;
                   });
 
-                  // Optional: แสดง dialog หรือ navigate ไปหน้าอื่น
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('พบรหัส: ${barcode.rawValue}')),
                   );
+                  Get.toNamed("/afterScan", arguments: this.barcode);
                 }
               }
             },
           ),
+
+          // ชั้น Mask สีดำรอบกรอบสแกน
+          Positioned.fill(
+            child: Stack(
+              children: [
+                // Top Mask
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: scanTop,
+                  child: Container(color: Colors.black.withOpacity(0.6)),
+                ),
+                // Bottom Mask
+                Positioned(
+                  top: scanTop + scanBorderSize,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(color: Colors.black.withOpacity(0.6)),
+                ),
+                // Left Mask
+                Positioned(
+                  top: scanTop,
+                  left: 0,
+                  width: scanLeft,
+                  height: scanBorderSize,
+                  child: Container(color: Colors.black.withOpacity(0.6)),
+                ),
+                // Right Mask
+                Positioned(
+                  top: scanTop,
+                  right: 0,
+                  width: scanLeft,
+                  height: scanBorderSize,
+                  child: Container(color: Colors.black.withOpacity(0.6)),
+                ),
+              ],
+            ),
+          ),
+
           // กรอบสแกน
-          Center(
+          Positioned(
+            top: scanTop,
+            left: scanLeft,
             child: Container(
               width: scanBorderSize,
               height: scanBorderSize,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.white, width: 3),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(0),
               ),
             ),
           ),
-          // เส้นแสกนวิ่ง
+
+          // เส้นสแกนวิ่ง
           AnimatedBuilder(
             animation: _animation,
             builder: (_, __) {
               return Positioned(
                 top:
-                    MediaQuery.of(context).size.height * 0.2 +
-                    (_animation.value * scanBorderSize),
-                left: MediaQuery.of(context).size.width * 0.15,
+                    scanTop +
+                    (_animation.value *
+                        (scanBorderSize - scanLinePadding * 2)) +
+                    scanLinePadding,
+                left: scanLeft + scanLinePadding,
                 child: Container(
-                  width: scanBorderSize,
+                  width: scanBorderSize - scanLinePadding * 2,
                   height: 2,
                   color: Colors.greenAccent,
                 ),
               );
             },
           ),
-          // ข้อความด้านล่าง
+
+          // ข้อความใต้กรอบ
+          Positioned(
+            top: scanTop + scanBorderSize + 16,
+            width: screenSize.width,
+            child: Center(
+              child: Text(
+                'Scanning barcode...',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+
+          // ข้อความด้านล่างสุด
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -107,7 +175,7 @@ class _ScannerState extends State<Scanner> with SingleTickerProviderStateMixin {
                     ? 'กรุณานำกล้องไปยังบาร์โค้ดหรือ QR Code'
                     : 'สแกนสำเร็จ: $barcode',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(fontSize: 18, color: Colors.white),
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.white),
               ),
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:project_official/app/view/after_scan.dart';
 
 import 'package:project_official/app/view/compass.dart';
 import 'package:project_official/app/view/frame.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: "/prayerTime", page: () => PrayerTime()),
         GetPage(name: "/compass", page: () => CompassPage()),
         GetPage(name: "/setting", page: () => Setting()),
+        GetPage(name: "/afterScan", page: () => AfterScan()),
       ],
     );
   }
