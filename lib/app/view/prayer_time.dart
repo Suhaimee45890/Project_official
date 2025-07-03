@@ -1,7 +1,10 @@
-// prayer_time.dart
-import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ohochat_address/ohochat_address.dart' as address;
 
 class PrayerTime extends StatefulWidget {
   const PrayerTime({super.key});
@@ -15,33 +18,92 @@ class _PrayerTimeState extends State<PrayerTime>
   int currentDayIndex = 0;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  late List<Map<String, String>> prayerTimesList = [];
+  Position? pos;
 
-  final List<Map<String, String>> prayerTimesList = [
-    {
-      'day': 'Today',
-      'Fajr': '05:00 AM',
-      'Dhuhr': '12:15 PM',
-      'Asr': '03:45 PM',
-      'Maghrib': '06:30 PM',
-      'Isha': '08:00 PM',
-    },
-    {
-      'day': 'Tomorrow',
-      'Fajr': '05:01 AM',
-      'Dhuhr': '12:16 PM',
-      'Asr': '03:46 PM',
-      'Maghrib': '06:31 PM',
-      'Isha': '08:01 PM',
-    },
-    {
-      'day': 'Next Day',
-      'Fajr': '05:02 AM',
-      'Dhuhr': '12:17 PM',
-      'Asr': '03:47 PM',
-      'Maghrib': '06:32 PM',
-      'Isha': '08:02 PM',
-    },
-  ];
+  String currentDate = "Loading...";
+  String hijriDate = "Loading...";
+  String location = "unknown";
+
+  Future<void> determinePosition() async {
+    bool serviceEnable;
+    LocationPermission permission;
+
+    serviceEnable = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnable) {
+      return Future.error("Location services are disabled");
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error("Location permissions are denied");
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error("Location permissions are permanently denied");
+    }
+
+    pos = await Geolocator.getCurrentPosition();
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        pos!.latitude,
+        pos!.longitude,
+      );
+      final postC = placemarks[1].postalCode;
+      if (placemarks[1].isoCountryCode == "TH") {
+        final locationTH = address.Location();
+        List<address.DatabaseSchema> results = locationTH.execute(
+          address.DatabaseSchemaQuery(postalCode: postC),
+        );
+
+        location =
+            ' ${results.first.districtName} ,${results.first.provinceName}';
+      } else {
+        location =
+            ' ${placemarks[1].thoroughfare} ,${placemarks[1].isoCountryCode}';
+      }
+
+      // print(results.map((e) => e.toJson()));
+    } catch (e) {
+      throw Exception("cannot get location");
+    }
+
+    int today = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    int tomorrow =
+        DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch ~/ 1000;
+    int nextTomorrow =
+        DateTime.now().add(Duration(days: 2)).millisecondsSinceEpoch ~/ 1000;
+    final getConnect = GetConnect();
+    List day = [today, tomorrow, nextTomorrow];
+    List dayTitle = ["Today", "Tomorrow", "next Tomorrow"];
+
+    for (int i = 0; i < 3; i++) {
+      final response = await getConnect.get(
+        'https://api.aladhan.com/v1/timings/${day[i]}?latitude=${pos?.latitude}&longitude=${pos?.longitude}&method=3',
+      );
+      final data = response.body['data'];
+      final timings = data['timings'];
+      if (i == 0) {
+        final date = data["date"];
+        currentDate = date['gregorian']['date']; // เช่น "18-06-2025"
+        hijriDate =
+            "${date['hijri']['day']} ${date['hijri']['month']['en']} ${date['hijri']['year']} AH";
+      }
+      prayerTimesList.add({
+        'day': dayTitle[i],
+        'Fajr': timings['Fajr'],
+        'Subhi': timings['Sunrise'],
+        'Dhuhr': timings['Dhuhr'],
+        'Asr': timings['Asr'],
+        'Maghrib': timings['Maghrib'],
+        'Isha': timings['Isha'],
+      });
+    }
+    setState(() {});
+  }
 
   void _changeDay(int direction) {
     setState(() {
@@ -55,6 +117,8 @@ class _PrayerTimeState extends State<PrayerTime>
     switch (name) {
       case 'Fajr':
         return Icons.wb_twilight;
+      case 'Subhi':
+        return Icons.wb_sunny_sharp;
       case 'Dhuhr':
         return Icons.wb_sunny;
       case 'Asr':
@@ -74,10 +138,10 @@ class _PrayerTimeState extends State<PrayerTime>
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: Colors.orange.shade100,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: Colors.white, size: 24),
+        child: Icon(icon, color: Colors.orange.shade700, size: 24),
       ),
     );
   }
@@ -93,6 +157,7 @@ class _PrayerTimeState extends State<PrayerTime>
       begin: 1.0,
       end: 1.2,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    determinePosition();
   }
 
   @override
@@ -103,13 +168,22 @@ class _PrayerTimeState extends State<PrayerTime>
 
   @override
   Widget build(BuildContext context) {
-    final currentDay = prayerTimesList[currentDayIndex];
+    final currentDay = (prayerTimesList.isNotEmpty)
+        ? prayerTimesList[currentDayIndex]
+        : {
+            'day': 'Loading',
+            'Fajr': '--:--',
+            'Subhi': '--:--',
+            'Dhuhr': '--:--',
+            'Asr': '--:--',
+            'Maghrib': '--:--',
+            'Isha': '--:--',
+          };
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.orange.shade400,
         elevation: 0,
         title: Text(
           "Prayer Time",
@@ -120,167 +194,155 @@ class _PrayerTimeState extends State<PrayerTime>
         ),
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF0f2027),
-                  Color(0xFF203a43),
-                  Color(0xFF2c5364),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // วันที่
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      currentDate,
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      hijriDate,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+
+              // กล่องเวลาละหมาด
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 12,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      location,
+                      style: GoogleFonts.poppins(
+                        color: Colors.orange.shade700,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        roundArrowButton(
+                          Icons.arrow_back_ios,
+                          () => _changeDay(-1),
+                        ),
                         Text(
-                          "Wednesday, June 18",
+                          currentDay['day']!,
                           style: GoogleFonts.poppins(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black87,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          "22 Dhu Hijrah 1446 AH",
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            color: Colors.white70,
-                          ),
+                        roundArrowButton(
+                          Icons.arrow_forward_ios,
+                          () => _changeDay(1),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.2)),
-                    ),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Prayer Time",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
+                    const SizedBox(height: 20),
+                    ...["Fajr", "Subhi", "Dhuhr", "Asr", "Maghrib", "Isha"].map(
+                      (name) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              roundArrowButton(
-                                Icons.arrow_back_ios,
-                                () => _changeDay(-1),
-                              ),
+                              Icon(getPrayerIcon(name), color: Colors.orange),
                               Text(
-                                currentDay['day']!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
+                                name,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  color: Colors.black87,
                                 ),
                               ),
-                              roundArrowButton(
-                                Icons.arrow_forward_ios,
-                                () => _changeDay(1),
+                              Text(
+                                currentDay[name]!,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
-                          ...["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((
-                            name,
-                          ) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Icon(
-                                    getPrayerIcon(name),
-                                    color: Colors.white,
-                                  ),
-                                  Text(
-                                    name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    currentDay[name]!,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.white24),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "นี่คือหน้าแจ้งเตือนเวลาละหมาด",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "คุณสามารถตั้งค่าการเตือนในเวลาที่เหมาะสม และเปิด/ปิดเสียงได้ตามต้องการ เพื่อไม่พลาดเวลาสำคัญของคุณ",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                ],
+                        );
+                      },
+                    ).toList(),
+                  ],
+                ),
               ),
-            ),
+
+              const SizedBox(height: 30),
+
+              // กล่องแจ้งเตือน
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "แจ้งเตือนเวลาละหมาด",
+                        style: GoogleFonts.poppins(
+                          color: Colors.orange.shade900,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "คุณสามารถตั้งค่าการเตือนในเวลาที่เหมาะสม และเปิด/ปิดเสียงได้ตามต้องการ เพื่อไม่พลาดเวลาสำคัญของคุณ",
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[800],
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 50),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

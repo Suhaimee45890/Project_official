@@ -67,11 +67,37 @@ class Home extends StatelessWidget {
             icon: Icons.explore,
             onTap: () => Navigator.pushNamed(context, "/compass"),
           ),
-          ElevatedButton(
-            onPressed: () {
-              print(Storage().readData());
-            },
-            child: Text("data"),
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "ค้นหา/แนะนำมัสยิดใกล้เคียง",
+            subtitle: "Comming Soon",
+            icon: Icons.explore,
+            onTap: () => Navigator.pushNamed(context, "/compass"),
+          ),
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "ระบบข่าวสารอิสลาม/บทความ",
+            subtitle: "Comming Soon",
+            icon: Icons.explore,
+            onTap: () => Navigator.pushNamed(context, "/compass"),
+          ),
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "ปฏิทินฮิจเราะห์ + วันสำคัญอิสลาม",
+            subtitle: "Comming Soon",
+            icon: Icons.explore,
+            onTap: () => Navigator.pushNamed(context, "/compass"),
+          ),
+          const SizedBox(height: 30),
+          _buildServiceCard(
+            context,
+            title: "ดุอาอ์หลังละหมาด",
+            subtitle: "Comming Soon",
+            icon: Icons.explore,
+            onTap: () => Navigator.pushNamed(context, "/compass"),
           ),
         ],
       ),
