@@ -6,6 +6,7 @@ import 'package:project_official/app/view/after_scan.dart';
 
 import 'package:project_official/app/view/compass.dart';
 import 'package:project_official/app/view/frame.dart';
+import 'package:project_official/app/view/islamic.dart';
 import 'package:project_official/app/view/prayer_time.dart';
 import 'package:project_official/app/view/scanner.dart';
 import 'package:project_official/app/view/titile1.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: "/prayerTime", page: () => PrayerTime()),
         GetPage(name: "/compass", page: () => CompassPage()),
         GetPage(name: "/setting", page: () => Setting()),
-        GetPage(name: "/afterScan", page: () => AfterScan()),
+        GetPage(name: "/islamic", page: () => Islamic()),
       ],
     );
   }

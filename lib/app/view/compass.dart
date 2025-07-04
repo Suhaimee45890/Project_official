@@ -1,7 +1,6 @@
-import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'dart:math' as math;
 
 class CompassPage extends StatefulWidget {
   const CompassPage({super.key});
@@ -11,96 +10,81 @@ class CompassPage extends StatefulWidget {
 }
 
 class _CompassPageState extends State<CompassPage> {
-  double _direction = 0;
+  double? _heading;
 
-  StreamSubscription<CompassEvent>? _compassSubscription;
+  static const double targetAngle = 286.0; // ทิศที่ต้องการ (286°)
+  static const double tolerance = 5.0; // ±5°
 
   @override
   void initState() {
     super.initState();
-    _compassSubscription = FlutterCompass.events?.listen((CompassEvent event) {
-      if (event.heading != null) {
-        setState(() {
-          _direction = event.heading!;
-        });
-      }
+    FlutterCompass.events?.listen((event) {
+      setState(() {
+        _heading = event.heading;
+      });
     });
   }
 
-  @override
-  void dispose() {
-    _compassSubscription?.cancel();
-    super.dispose();
+  bool isAligned() {
+    if (_heading == null) return false;
+    double heading = (_heading! + 360) % 360; // normalize 0-360
+    double diff = (heading - targetAngle).abs();
+    if (diff > 180) diff = 360 - diff; // ปรับหามุมที่สั้นที่สุด
+    return diff <= tolerance;
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isTargetDirection = (_direction >= 275 && _direction <= 285);
+    final aligned = isAligned();
+
+    // คำนวณมุมหมุน (normalized 0-360 องศา แปลงเป็นเรเดียน)
+    double angleInDegrees = ((_heading ?? 0) - targetAngle) % 360;
+    double angleInRadians = angleInDegrees * (math.pi / 180);
 
     return Scaffold(
-      extendBodyBehindAppBar: false,
+      backgroundColor: aligned ? Colors.green.shade100 : Colors.white,
       appBar: AppBar(
-        title: Text(
-          "Compass",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 40,
-          ),
-        ),
+        title: const Text('เข็มทิศ 286° ±5°'),
+        backgroundColor: aligned ? Colors.green : Colors.blueGrey,
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        actions: [Icon(Icons.menu, color: Colors.white)],
       ),
-      backgroundColor: isTargetDirection ? Colors.green : Colors.blueGrey[900],
       body: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // วงกลม
-            Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white54, width: 6),
-              ),
-            ),
-
-            // เข็มหมุน
-            Transform.rotate(
-              angle: ((_direction) * (pi / 180) * -1),
-              child: Icon(Icons.navigation, color: Colors.white, size: 120),
-            ),
-
-            // แสดงองศา
-            Positioned(
-              bottom: 60,
-              child: Text(
-                "${_direction.toStringAsFixed(0)}°",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            // คำเตือนเมื่อถึงเป้า
-            if (isTargetDirection)
-              Positioned(
-                top: 80,
-                child: Text(
-                  "คุณกำลังชี้ไปที่ 280°",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+        child: _heading == null
+            ? const CircularProgressIndicator()
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Transform.rotate(
+                    angle: angleInRadians,
+                    child: Icon(
+                      Icons.navigation,
+                      size: 200,
+                      color: aligned ? Colors.green.shade800 : Colors.black87,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Heading: ${_heading!.toStringAsFixed(2)}°',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    'Target: $targetAngle° ±$tolerance°',
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  if (aligned)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text(
+                        '✅ ชี้ถูกต้อง!',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-          ],
-        ),
       ),
     );
   }

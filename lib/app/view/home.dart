@@ -1,25 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:project_official/storage/storage.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> services = [
+      {
+        'title': 'Halal Scanner',
+        'subtitle': 'สแกนฮาลาล',
+        'icon': Icons.qr_code_scanner,
+        'route': '/scanner',
+      },
+      {
+        'title': 'Prayer Time',
+        'subtitle': 'เวลาละหมาด',
+        'icon': Icons.access_time,
+        'route': '/prayerTime',
+      },
+      {
+        'title': 'Compass',
+        'subtitle': 'เข็มทิศหากิบลัต',
+        'icon': Icons.explore,
+        'route': '/compass',
+      },
+      {
+        'title': 'มัสยิดใกล้เคียง',
+        'subtitle': 'Coming Soon',
+        'icon': Icons.location_on,
+        'route': '/compass',
+      },
+      {
+        'title': 'ข่าวสาร/บทความ',
+        'subtitle': 'Coming Soon',
+        'icon': Icons.article,
+        'route': '/compass',
+      },
+      {
+        'title': 'ปฏิทินอิสลาม',
+        'subtitle': 'Coming Soon',
+        'icon': Icons.calendar_month,
+        'route': "/islamic",
+      },
+    ];
+
     return Scaffold(
-      extendBody: true,
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: const Text(
           "Our Services",
           style: TextStyle(
             color: Colors.white,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
-            fontSize: 30,
           ),
         ),
         centerTitle: true,
+        elevation: 0,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -29,137 +67,67 @@ class Home extends StatelessWidget {
             ),
           ),
         ),
-        elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-        children: [
-          Center(
-            child: Text(
-              "Select Services",
-              style: GoogleFonts.poppins(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: GridView.builder(
+          itemCount: services.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // 2 columns
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.1,
           ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "Halal Scanner",
-            subtitle: "สแกนฮาลาล",
-            icon: Icons.qr_code_scanner,
-            onTap: () => Navigator.pushNamed(context, "/scanner"),
-          ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "Prayer Time",
-            subtitle: "เวลาละหมาด",
-            icon: Icons.access_time,
-            onTap: () => Navigator.pushNamed(context, "/prayerTime"),
-          ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "Compass",
-            subtitle: "เข็มทิศหากิบลัต",
-            icon: Icons.explore,
-            onTap: () => Navigator.pushNamed(context, "/compass"),
-          ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "ค้นหา/แนะนำมัสยิดใกล้เคียง",
-            subtitle: "Comming Soon",
-            icon: Icons.explore,
-            onTap: () => Navigator.pushNamed(context, "/compass"),
-          ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "ระบบข่าวสารอิสลาม/บทความ",
-            subtitle: "Comming Soon",
-            icon: Icons.explore,
-            onTap: () => Navigator.pushNamed(context, "/compass"),
-          ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "ปฏิทินฮิจเราะห์ + วันสำคัญอิสลาม",
-            subtitle: "Comming Soon",
-            icon: Icons.explore,
-            onTap: () => Navigator.pushNamed(context, "/compass"),
-          ),
-          const SizedBox(height: 30),
-          _buildServiceCard(
-            context,
-            title: "ดุอาอ์หลังละหมาด",
-            subtitle: "Comming Soon",
-            icon: Icons.explore,
-            onTap: () => Navigator.pushNamed(context, "/compass"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildServiceCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 12,
-              offset: Offset(0, 8),
-            ),
-          ],
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.black,
-              radius: 28,
-              child: Icon(icon, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
+          itemBuilder: (context, index) {
+            final service = services[index];
+            return GestureDetector(
+              onTap: () => Navigator.pushNamed(context, service['route']),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10,
+                      offset: Offset(2, 6),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: Colors.grey[600],
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.orange.shade600,
+                      radius: 26,
+                      child: Icon(
+                        service['icon'],
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    Text(
+                      service['title'],
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      service['subtitle'],
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.arrow_forward_ios, color: Colors.grey),
-          ],
+            );
+          },
         ),
       ),
     );

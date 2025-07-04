@@ -1,21 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- เพิ่มสิทธิ์กล้อง -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <!-- เพิ่มสิทธิ์ GPS-->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-
-    <!-- ระบุว่าอุปกรณ์มีเซ็นเซอร์เข็มทิศ (optional) -->
-    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
-
     <application
-        android:label="Selamat"
+        android:label="islamic_calendar_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:enableOnBackInvokedCallback="true"
-        >
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"
