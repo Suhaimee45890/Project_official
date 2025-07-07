@@ -9,6 +9,10 @@
 
     <!-- ระบุว่าอุปกรณ์มีเซ็นเซอร์เข็มทิศ (optional) -->
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
+    
+    <!-- ขอสิทธิ์ Location (optional) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
 
     <application
         android:label="Selamat"

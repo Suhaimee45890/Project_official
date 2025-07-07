@@ -29,19 +29,19 @@ class Home extends StatelessWidget {
         'title': 'มัสยิดใกล้เคียง',
         'subtitle': 'Coming Soon',
         'icon': Icons.location_on,
-        'route': '/compass',
+        'route': "/nearbyMosqueMap",
       },
       {
         'title': 'ข่าวสาร/บทความ',
         'subtitle': 'Coming Soon',
         'icon': Icons.article,
-        'route': '/compass',
+        'route': "/islamicArticlesPage",
       },
       {
         'title': 'ปฏิทินอิสลาม',
         'subtitle': 'Coming Soon',
         'icon': Icons.calendar_month,
-        'route': "/islamic",
+        'route': "/islamicArticlesPage",
       },
     ];
 
