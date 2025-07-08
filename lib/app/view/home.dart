@@ -6,6 +6,10 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String userName = "Suhaimee"; // ชื่อผู้ใช้
+    final String profileImageUrl =
+        "https://i.pravatar.cc/150?img=3"; // ลิงก์รูปโปรไฟล์ (เปลี่ยนตามจริงได้)
+
     final List<Map<String, dynamic>> services = [
       {
         'title': 'Halal Scanner',
@@ -41,29 +45,43 @@ class Home extends StatelessWidget {
         'title': 'ปฏิทินอิสลาม',
         'subtitle': 'Coming Soon',
         'icon': Icons.calendar_month,
-        'route': "/islamicArticlesPage",
+        'route': "/islamicCalendar",
       },
     ];
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Our Services",
-          style: TextStyle(
+        title: Text(
+          "Hi , $userName",
+          style: const TextStyle(
             color: Colors.white,
-            fontSize: 28,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, "/account"); // ไปหน้าโปรไฟล์
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(profileImageUrl),
+              ),
+            ),
+          ),
+        ],
         elevation: 0,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                const Color.fromARGB(255, 11, 101, 52),
-                const Color.fromARGB(255, 11, 101, 52),
+                Color.fromARGB(255, 11, 101, 52),
+                Color.fromARGB(255, 11, 101, 52),
               ],
               begin: Alignment.topLeft,
               end: Alignment.topRight,
@@ -76,7 +94,7 @@ class Home extends StatelessWidget {
         child: GridView.builder(
           itemCount: services.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // 2 columns
+            crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
             childAspectRatio: 1.1,
@@ -102,11 +120,10 @@ class Home extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       backgroundColor: const Color.fromARGB(255, 11, 101, 52),
-
                       radius: 26,
                       child: Icon(
                         service['icon'],
-                        color: const Color.fromARGB(255, 255, 255, 255),
+                        color: Colors.white,
                         size: 28,
                       ),
                     ),

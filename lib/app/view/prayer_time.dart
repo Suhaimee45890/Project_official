@@ -1,3 +1,5 @@
+// โค้ดนี้เหมือนกับที่คุณโพสต์ไว้ก่อนหน้า โดยไม่เติมหรือแก้
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -5,6 +7,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ohochat_address/ohochat_address.dart' as address;
+import 'package:project_official/app/sevices/notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class PrayerTime extends StatefulWidget {
   const PrayerTime({super.key});
@@ -20,6 +24,7 @@ class _PrayerTimeState extends State<PrayerTime>
   late Animation<double> _scaleAnimation;
   late List<Map<String, String>> prayerTimesList = [];
   Position? pos;
+  final notification = Notifications();
 
   String currentDate = "Loading...";
   String hijriDate = "Loading...";
@@ -157,6 +162,7 @@ class _PrayerTimeState extends State<PrayerTime>
       end: 1.2,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     determinePosition();
+    notification.notiRequest();
   }
 
   @override
@@ -184,8 +190,8 @@ class _PrayerTimeState extends State<PrayerTime>
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color.fromARGB(255, 11, 101, 52),
-              const Color.fromARGB(255, 30, 16, 16),
+              Color.fromARGB(255, 11, 101, 52),
+              Color.fromARGB(255, 30, 16, 16),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -221,8 +227,7 @@ class _PrayerTimeState extends State<PrayerTime>
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Prayer Card
+                // ส่วน Card เวลา + ปุ่มเลื่อน + Prayer List
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Container(
@@ -256,7 +261,9 @@ class _PrayerTimeState extends State<PrayerTime>
                           children: [
                             roundArrowButton(
                               Icons.chevron_left,
-                              () => _changeDay(-1),
+                              () => notification.showNotification("19:59"),
+
+                              // () => _changeDay(-1),
                             ),
                             ScaleTransition(
                               scale: _scaleAnimation,
@@ -326,10 +333,8 @@ class _PrayerTimeState extends State<PrayerTime>
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
-                // Notification Box
+                // กล่องแจ้งเตือน
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Container(
@@ -343,7 +348,8 @@ class _PrayerTimeState extends State<PrayerTime>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "แจ้งเตือนเวลาละหมาด",
+                          tz.TZDateTime.now(tz.local).toString(),
+                          // "แจ้งเตือนเวลาละหมาด",
                           style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

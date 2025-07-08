@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:project_official/app/view/IslamicArticlesPage.dart';
+import 'package:project_official/app/view/account.dart';
 import 'package:project_official/app/view/after_scan.dart';
 import 'package:project_official/app/view/compass.dart';
 import 'package:project_official/app/view/frame.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: "/setting", page: () => Setting()),
         GetPage(name: "/afterScan", page: () => AfterScan()),
         GetPage(name: "/nearbyMosqueMap", page: () => IslamicArticlesPage()),
+        GetPage(name: "/account", page: () => Account()),
         GetPage(
           name: "/islamicArticlesPage",
           page: () => IslamicArticlesPage(),
