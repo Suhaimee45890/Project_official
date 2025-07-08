@@ -1,6 +1,3 @@
-// โค้ดนี้เหมือนกับที่คุณโพสต์ไว้ก่อนหน้า โดยไม่เติมหรือแก้
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -8,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ohochat_address/ohochat_address.dart' as address;
 import 'package:project_official/app/sevices/notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 class PrayerTime extends StatefulWidget {
   const PrayerTime({super.key});
@@ -17,29 +13,22 @@ class PrayerTime extends StatefulWidget {
   State<PrayerTime> createState() => _PrayerTimeState();
 }
 
-class _PrayerTimeState extends State<PrayerTime>
-    with SingleTickerProviderStateMixin {
-  int currentDayIndex = 0;
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _PrayerTimeState extends State<PrayerTime> {
   late List<Map<String, String>> prayerTimesList = [];
   Position? pos;
   final notification = Notifications();
 
-  String currentDate = "Loading...";
-  String hijriDate = "Loading...";
-  String location = "กำลังดึงข้อมูล...";
+  String location = "Loading...";
+  String upcomingPrayer = "Loading...";
+  String timeToGo = "";
+  String sunriseTime = "--:--";
+  String sunsetTime = "--:--";
 
   Future<void> determinePosition() async {
-    bool serviceEnable;
-    LocationPermission permission;
+    bool serviceEnable = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnable) return Future.error("Location services are disabled");
 
-    serviceEnable = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnable) {
-      return Future.error("Location services are disabled");
-    }
-
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
@@ -63,68 +52,87 @@ class _PrayerTimeState extends State<PrayerTime>
         List<address.DatabaseSchema> results = locationTH.execute(
           address.DatabaseSchemaQuery(postalCode: postC),
         );
-
         location =
-            ' ${results.first.districtName} ,${results.first.provinceName}';
+            '${results.first.districtName}, ${results.first.provinceName}';
       } else {
-        location =
-            ' ${placemarks[1].thoroughfare} ,${placemarks[1].isoCountryCode}';
+        location = '${placemarks[1].locality}, ${placemarks[1].isoCountryCode}';
       }
     } catch (e) {
-      location = "ไม่สามารถดึงข้อมูลพิกัดได้";
+      location = "Unable to fetch location";
     }
 
-    int today = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    int tomorrow =
-        DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch ~/ 1000;
-    int nextTomorrow =
-        DateTime.now().add(Duration(days: 2)).millisecondsSinceEpoch ~/ 1000;
+    final today = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final getConnect = GetConnect();
-    List day = [today, tomorrow, nextTomorrow];
-    List dayTitle = ["วันนี้", "พรุ่งนี้", "มะรืนนี้"];
+    final response = await getConnect.get(
+      'https://api.aladhan.com/v1/timings/$today?latitude=${pos?.latitude}&longitude=${pos?.longitude}&method=3',
+    );
 
-    for (int i = 0; i < 3; i++) {
-      final response = await getConnect.get(
-        'https://api.aladhan.com/v1/timings/${day[i]}?latitude=${pos?.latitude}&longitude=${pos?.longitude}&method=3',
-      );
-      final data = response.body['data'];
-      final timings = data['timings'];
-      if (i == 0) {
-        final date = data["date"];
-        currentDate = date['gregorian']['date'];
-        hijriDate =
-            "${date['hijri']['day']} ${date['hijri']['month']['en']} ${date['hijri']['year']} AH";
-      }
-      prayerTimesList.add({
-        'day': dayTitle[i],
-        'Fajr': timings['Fajr'],
-        'Subhi': timings['Sunrise'],
-        'Dhuhr': timings['Dhuhr'],
-        'Asr': timings['Asr'],
-        'Maghrib': timings['Maghrib'],
-        'Isha': timings['Isha'],
-      });
-    }
+    final data = response.body['data'];
+    final timings = data['timings'];
 
+    sunriseTime = timings['Sunrise'];
+    sunsetTime = timings['Sunset'];
+
+    prayerTimesList.add({
+      'Fajr': timings['Fajr'],
+      'Sunrise': timings['Sunrise'],
+      'Dhuhr': timings['Dhuhr'],
+      'Asr': timings['Asr'],
+      'Maghrib': timings['Maghrib'],
+      'Isha': timings['Isha'],
+    });
+
+    computeUpcomingPrayer(prayerTimesList[0]);
     setState(() {});
   }
 
-  void _changeDay(int direction) {
-    setState(() {
-      currentDayIndex = (currentDayIndex + direction) % prayerTimesList.length;
-      if (currentDayIndex < 0) currentDayIndex += prayerTimesList.length;
+  void computeUpcomingPrayer(Map<String, String> times) {
+    DateTime now = DateTime.now();
+    Map<String, DateTime> prayerDateTime = {};
+
+    times.forEach((name, time) {
+      final parts = time.split(":");
+      final hour = int.parse(parts[0]);
+      final minute = int.parse(parts[1]);
+      prayerDateTime[name] = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        minute,
+      );
     });
-    _controller.forward(from: 0);
+
+    for (var name in ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]) {
+      if (prayerDateTime[name]!.isAfter(now)) {
+        final diff = prayerDateTime[name]!.difference(now);
+        setState(() {
+          upcomingPrayer = name;
+          timeToGo =
+              "${diff.inHours} hours and ${diff.inMinutes % 60} minutes to go";
+        });
+        return;
+      }
+    }
+
+    // Fallback to next day's Fajr if no prayer remains
+    final nextFajr = prayerDateTime["Fajr"]!.add(const Duration(days: 1));
+    final diff = nextFajr.difference(now);
+    setState(() {
+      upcomingPrayer = "Fajr (Tomorrow)";
+      timeToGo =
+          "${diff.inHours} hours and ${diff.inMinutes % 60} minutes to go";
+    });
   }
 
   IconData getPrayerIcon(String name) {
     switch (name) {
       case 'Fajr':
         return Icons.wb_twilight;
-      case 'Subhi':
-        return Icons.wb_sunny_sharp;
-      case 'Dhuhr':
+      case 'Sunrise':
         return Icons.wb_sunny;
+      case 'Dhuhr':
+        return Icons.wb_sunny_outlined;
       case 'Asr':
         return Icons.brightness_medium;
       case 'Maghrib':
@@ -136,239 +144,215 @@ class _PrayerTimeState extends State<PrayerTime>
     }
   }
 
-  Widget roundArrowButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.orange.shade100,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Icon(icon, color: Colors.orange.shade800, size: 24),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     determinePosition();
     notification.notiRequest();
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final currentDay = (prayerTimesList.isNotEmpty)
-        ? prayerTimesList[currentDayIndex]
-        : {
-            'day': 'Loading',
-            'Fajr': '--:--',
-            'Subhi': '--:--',
-            'Dhuhr': '--:--',
-            'Asr': '--:--',
-            'Maghrib': '--:--',
-            'Isha': '--:--',
-          };
+    final times = (prayerTimesList.isNotEmpty) ? prayerTimesList[0] : {};
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 11, 101, 52),
-              Color.fromARGB(255, 30, 16, 16),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1B5E20),
+        elevation: 0,
+        title: Text(
+          "Accurate Prayer Times",
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
+        centerTitle: true,
+      ),
+      body: Container(
+        color: const Color(0xFF1B5E20),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        currentDate,
+                        location,
                         style: GoogleFonts.poppins(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 12),
                       Text(
-                        hijriDate,
+                        "UPCOMING PRAYER",
                         style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          color: Colors.grey[800],
+                          color: Colors.white70,
+                          fontSize: 14,
                         ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "$upcomingPrayer  •  $timeToGo",
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.brightness_5,
+                                color: Colors.white70,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "sunset\n$sunsetTime",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.wb_sunny, color: Colors.white70),
+                              const SizedBox(width: 8),
+                              Text(
+                                "sunrise\n$sunriseTime",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                // ส่วน Card เวลา + ปุ่มเลื่อน + Prayer List
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          location,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            color: Colors.orange.shade700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 12,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: times.entries.map((entry) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
                           children: [
-                            roundArrowButton(
-                              Icons.chevron_left,
-                              () => notification.showNotification("19:59"),
-
-                              // () => _changeDay(-1),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.yellow.shade100,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                getPrayerIcon(entry.key),
+                                size: 22,
+                                color: Colors.amber.shade900,
+                              ),
                             ),
-                            ScaleTransition(
-                              scale: _scaleAnimation,
+                            const SizedBox(width: 12),
+                            Expanded(
                               child: Text(
-                                currentDay['day']!,
+                                entry.key,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                            roundArrowButton(
-                              Icons.chevron_right,
-                              () => _changeDay(1),
+                            Text(
+                              entry.value,
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        Divider(),
-                        const SizedBox(height: 10),
-                        ...[
-                          "Fajr",
-                          "Subhi",
-                          "Dhuhr",
-                          "Asr",
-                          "Maghrib",
-                          "Isha",
-                        ].map(
-                          (name) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.shade100,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  child: Icon(
-                                    getPrayerIcon(name),
-                                    size: 22,
-                                    color: Colors.deepOrange,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    name,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  currentDay[name]!,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                const SizedBox(height: 30),
-                // กล่องแจ้งเตือน
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 24,
+                  ),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.orange.shade200),
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          tz.TZDateTime.now(tz.local).toString(),
-                          // "แจ้งเตือนเวลาละหมาด",
+                          "Stay Connected",
                           style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange.shade900,
+                            color: Colors.green.shade800,
                           ),
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          "คุณสามารถตั้งค่าการเตือนในเวลาที่เหมาะสม และเปิด/ปิดเสียงได้ตามต้องการ เพื่อไม่พลาดเวลาสำคัญของคุณ",
+                          "Never miss a prayer! You can enable notifications to alert you before each prayer time.",
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: Colors.grey[800],
+                            color: Colors.green.shade900,
                           ),
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            notification.showNotification(
+                              "Next Prayer at: $upcomingPrayer",
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              255,
+                              255,
+                              255,
+                            ),
+                          ),
+                          icon: const Icon(Icons.notifications_active),
+                          label: const Text("Enable Prayer Alerts"),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
               ],
             ),
           ),
