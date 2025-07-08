@@ -46,7 +46,7 @@ class Home extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "Our Services",
@@ -61,9 +61,12 @@ class Home extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange, Colors.deepOrange],
+              colors: [
+                const Color.fromARGB(255, 11, 101, 52),
+                const Color.fromARGB(255, 11, 101, 52),
+              ],
               begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              end: Alignment.topRight,
             ),
           ),
         ),
@@ -98,11 +101,12 @@ class Home extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      backgroundColor: Colors.orange.shade600,
+                      backgroundColor: const Color.fromARGB(255, 11, 101, 52),
+
                       radius: 26,
                       child: Icon(
                         service['icon'],
-                        color: Colors.white,
+                        color: const Color.fromARGB(255, 255, 255, 255),
                         size: 28,
                       ),
                     ),

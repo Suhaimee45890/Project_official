@@ -1,10 +1,7 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:project_official/app/controller/upload_pic.dart';
 
 class AfterScan extends StatefulWidget {
@@ -27,26 +24,10 @@ class _AfterScanState extends State<AfterScan> {
   bool halal = false;
   bool? isFound;
   String? imagePath;
-
-  Future<void> fetchProduct() async {
-    final GetConnect fetch = GetConnect();
-
-    Response response = await fetch.get(
-      "https://world.openfoodfacts.org/api/v0/product/${barcode}.json",
-    );
-    if (response.body["status_verbose"] == "product not found") {
-      image =
-          "https://res.cloudinary.com/dzd7lt1ck/image/upload/v1751549893/product-not-found_wvlmoa.jpg";
-    } else {
-      image = response.body["product"]["image_front_url"].toString();
-    }
-
-    setState(() {
-      isLoading = false;
-    });
-  }
+  bool upLoading = false;
 
   Future<void> checkFirebase(String barcode) async {
+    isLoading = true;
     DocumentSnapshot<Map<String, dynamic>> response = await FirebaseFirestore
         .instance
         .collection("products")
@@ -62,9 +43,9 @@ class _AfterScanState extends State<AfterScan> {
     } else {
       isFound = false;
     }
-    setState(() {
-      isLoading = false;
-    });
+    isLoading = false;
+
+    setState(() {});
   }
 
   Future<void> addData() async {
@@ -100,57 +81,77 @@ class _AfterScanState extends State<AfterScan> {
     return Scaffold(
       appBar: AppBar(title: Text("Product not found")),
       body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              imagePath == null
-                  ? ElevatedButton(
-                      onPressed: () async {
-                        imagePath = await UploadImg().pickImage();
-                        setState(() {});
-                      },
-                      child: Text("Upload Image"),
-                    )
-                  : Image.file(
-                      File(imagePath!),
-                      errorBuilder: (context, error, stackTrace) =>
-                          Icon(Icons.error_outline),
-                    ),
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(hint: Text("ใส่ชื่อ Product")),
-              ),
-              TextField(
-                controller: barcodeController,
-                decoration: InputDecoration(hint: Text(barcodeController.text)),
-              ),
-              DropdownButton<bool>(
-                value: halal,
-                onChanged: (value) {
-                  setState(() {
-                    halal = value!;
-                  });
-                },
-                items: [
-                  DropdownMenuItem(value: true, child: Text("Halal")),
-                  DropdownMenuItem(value: false, child: Text("No")),
-                ],
-              ),
-              if (imagePath != null)
-                Row(
+        child: upLoading
+            ? CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Column(
                   children: [
-                    ElevatedButton(onPressed: () {}, child: Text("Cancle")),
-                    ElevatedButton(
-                      onPressed: () {
-                        addData();
-                      },
-                      child: Text("Upload"),
+                    imagePath == null
+                        ? ElevatedButton(
+                            onPressed: () async {
+                              imagePath = await UploadImg().pickImage();
+                              setState(() {});
+                            },
+                            child: Text("Upload Image"),
+                          )
+                        : Image.file(
+                            File(imagePath!),
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.error_outline),
+                          ),
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        hint: Text("ใส่ชื่อ Product"),
+                      ),
                     ),
+                    TextField(
+                      controller: barcodeController,
+                      decoration: InputDecoration(
+                        hint: Text(barcodeController.text),
+                      ),
+                    ),
+                    DropdownButton<bool>(
+                      value: halal,
+                      onChanged: (value) {
+                        setState(() {
+                          halal = value!;
+                        });
+                      },
+                      items: [
+                        DropdownMenuItem(value: true, child: Text("Halal")),
+                        DropdownMenuItem(value: false, child: Text("No")),
+                      ],
+                    ),
+                    if (imagePath != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Get.toNamed("/scanner");
+                            },
+                            child: Text("Cancle"),
+                          ),
+                          SizedBox(width: 16),
+                          ElevatedButton(
+                            onPressed: () async {
+                              setState(() {
+                                upLoading = true;
+                              });
+                              await addData();
+                              setState(() {
+                                upLoading = false;
+                              });
+                              Get.offNamed("/scanner");
+                            },
+                            child: Text("Upload"),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
-            ],
-          ),
-        ),
+              ),
       ),
     );
   }
@@ -162,7 +163,7 @@ class _AfterScanState extends State<AfterScan> {
         child: Column(
           children: [
             Image.network(
-              image!,
+              image ?? "",
               errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
             ),
             Text(name ?? "name not found"),

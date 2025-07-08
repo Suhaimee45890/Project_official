@@ -45,7 +45,8 @@ class _CompassPageState extends State<CompassPage> {
       backgroundColor: aligned ? Colors.green.shade100 : Colors.white,
       appBar: AppBar(
         title: const Text('เข็มทิศ 286° ±5°'),
-        backgroundColor: aligned ? Colors.green : Colors.blueGrey,
+        backgroundColor: const Color.fromARGB(255, 11, 101, 52),
+
         centerTitle: true,
       ),
       body: Center(

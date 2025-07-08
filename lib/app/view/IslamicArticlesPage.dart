@@ -40,9 +40,12 @@ class IslamicArticlesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ข่าวสารและบทความอิสลาม'),
+        title: const Text(
+          'ข่าวสารและบทความอิสลาม',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(255, 11, 101, 52),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(12),

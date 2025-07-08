@@ -22,7 +22,7 @@ Future<void> login() async {
       password: passWordlController.text.trim(),
     );
     Storage().saveData(user.user?.uid ?? "");
-    Get.offAllNamed("/frame"); // ✅ เปลี่ยนหน้าและล้าง history
+    Get.offAllNamed("/frame");
   } on FirebaseException catch (e) {
     String message = "";
     if (e.code == "user-not-found") {
@@ -30,294 +30,194 @@ Future<void> login() async {
     } else if (e.code == "wrong-password") {
       message = "Wrong Password";
     } else {
-      message = e.message ?? "an error occurred";
+      message = e.message ?? "An error occurred";
     }
     Get.snackbar(
       "Login Failed",
       message,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
+      colorText: Colors.white,
     );
   }
 }
 
 class _LoginState extends State<Login> {
   bool _obscureText = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // ป้องกัน overflow
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.only(left: 16, top: 10, bottom: 8),
           child: Container(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 255, 255), // พื้นหลังปุ่ม
+            decoration: const BoxDecoration(
+              color: Colors.white,
               shape: BoxShape.circle,
             ),
             child: IconButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
             ),
           ),
         ),
         backgroundColor: Colors.transparent,
-        title: Text(
-          "Login",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        elevation: 0,
+
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            child: Image.asset("assets/images/login.jpg", fit: BoxFit.cover),
+          // พื้นหลัง
+          SizedBox.expand(
+            child: Image.asset("assets/images/Login5.jpg", fit: BoxFit.cover),
           ),
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            color: Color(0x90000000),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: 100),
-              Center(
-                child: Image.asset("assets/images/appLogo1.png", width: 250),
+          Container(color: const Color(0x90000000)),
+          SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                top: 100,
+                left: 16,
+                right: 16,
               ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Stack(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 600,
-                    width: double.infinity,
+                  Center(
+                    child: Image.asset(
+                      "assets/images/appLogo1.png",
+                      width: 250,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
 
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.amber,
-                          const Color.fromARGB(255, 167, 21, 21),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomLeft,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
+                  // Email
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      labelText: "Email",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Stack(
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  "Welcome Back!",
+                  const SizedBox(height: 15),
 
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  "Please sign in to continue."
-                                  "",
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                // Text(
-                                //   "via this app directly and confidence !",
-                                //   textAlign: TextAlign.center,
-                                //   style: TextStyle(
-                                //     color: Colors.black,
-                                //     fontSize: 20,
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                          ],
-                        ),
+                  // Password
+                  TextField(
+                    controller: passWordlController,
+                    obscureText: _obscureText,
+                    decoration: InputDecoration(
+                      hintText: 'Password',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SizedBox(
-                          child: TextField(
-                            controller: emailController,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: "Email",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            obscureText: false,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 0),
-
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: TextField(
-                          controller: passWordlController,
-                          obscureText: _obscureText,
-                          decoration: InputDecoration(
-                            hintText: 'Password',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureText
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          fixedSize: Size(200, 30),
-                          backgroundColor: Colors.black,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         onPressed: () {
-                          login();
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
                         },
-                        child: Text(
-                          "Login ",
-                          style: TextStyle(fontSize: 25, color: Colors.white),
-                        ),
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        "or continue with",
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Google login
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              20,
-                            ), // กำหนดมุมโค้ง
-                            child: InkWell(
-                              onTap: () {
-                                login();
-                              },
-                              child: Image.asset(
-                                'assets/images/Google.jpg',
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit
-                                    .cover, // ทำให้รูปภาพเต็มพื้นที่และไม่เบี้ยว
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 20),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              20,
-                            ), // กำหนดมุมโค้ง
-                            child: InkWell(
-                              onTap: () {
-                                Get.toNamed("/");
-                              },
-                              child: Image.asset(
-                                'assets/images/X.jpeg',
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit
-                                    .cover, // ทำให้รูปภาพเต็มพื้นที่และไม่เบี้ยว
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 20),
+                  // Login Button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: const Size(200, 45),
+                      backgroundColor: Colors.black,
+                    ),
+                    onPressed: () {
+                      login();
+                    },
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
-                          // Facebook login
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              20,
-                            ), // กำหนดมุมโค้ง
-                            child: InkWell(
-                              onTap: () {
-                                Get.toNamed("/");
-                              },
-                              child: Image.asset(
-                                'assets/images/faceboook.jpg',
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit
-                                    .cover, // ทำให้รูปภาพเต็มพื้นที่และไม่เบี้ยว
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  // or continue with
+                  Text(
+                    "or continue with",
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
-                      SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Register(),
-                            ), // ไปหน้านี้
-                          );
-                        },
-                        child: Text(
-                          'Create a new account ?',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline, // เส้นใต้
-                            color: Colors.white, // สีเหมือนลิงก์
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                  // Social Logins
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildSocialButton("assets/images/Google.jpg", () {
+                        login(); // หรือเพิ่มฟังก์ชัน Google Login
+                      }),
+                      const SizedBox(width: 15),
+                      _buildSocialButton("assets/images/X.jpeg", () {
+                        Get.toNamed("/");
+                      }),
+                      const SizedBox(width: 15),
+                      _buildSocialButton("assets/images/faceboook.jpg", () {
+                        Get.toNamed("/");
+                      }),
                     ],
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Register Link
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Register(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Create a new account ?',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSocialButton(String imagePath, VoidCallback onTap) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        child: Image.asset(imagePath, width: 80, height: 80, fit: BoxFit.cover),
       ),
     );
   }

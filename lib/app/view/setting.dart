@@ -19,8 +19,12 @@ class _SettingState extends State<Setting> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings', style: GoogleFonts.poppins()),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        title: Text(
+          'Settings',
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 11, 101, 52),
+
         foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
         elevation: 0,
         centerTitle: true,

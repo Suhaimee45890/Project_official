@@ -29,7 +29,7 @@ class _Title1 extends State<Title1> {
           Container(
             height: double.infinity,
             width: double.infinity,
-            child: Image.asset("assets/images/titile1.jpg", fit: BoxFit.cover),
+            child: Image.asset("assets/images/Login5.jpg", fit: BoxFit.cover),
           ),
           Container(
             height: double.infinity,
@@ -49,8 +49,8 @@ class _Title1 extends State<Title1> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.amber,
-                          const Color.fromARGB(255, 167, 21, 21),
+                          const Color.fromARGB(255, 11, 101, 52),
+                          const Color.fromARGB(255, 30, 16, 16),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomLeft,
@@ -75,7 +75,7 @@ class _Title1 extends State<Title1> {
                           style: GoogleFonts.poppins(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Colors.amber,
                           ),
                         ),
                         SizedBox(height: 20),
@@ -85,7 +85,7 @@ class _Title1 extends State<Title1> {
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             // fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                         Text(
@@ -94,7 +94,7 @@ class _Title1 extends State<Title1> {
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             // fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                         Text(
@@ -103,7 +103,7 @@ class _Title1 extends State<Title1> {
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             // fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                         SizedBox(height: 10),
@@ -116,7 +116,12 @@ class _Title1 extends State<Title1> {
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             fixedSize: Size(300, 60),
-                            backgroundColor: Colors.white,
+                            backgroundColor: const Color.fromARGB(
+                              255,
+                              253,
+                              253,
+                              253,
+                            ),
                           ),
                           onPressed: () {
                             Get.toNamed("/login"); // <-- ใช้ GetX
@@ -126,6 +131,7 @@ class _Title1 extends State<Title1> {
                             style: GoogleFonts.poppins(
                               fontSize: 25,
                               color: Colors.black,
+
                               fontWeight: FontWeight.bold,
                             ),
                           ),

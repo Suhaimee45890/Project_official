@@ -19,12 +19,12 @@ class _AState extends State<Account> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Account', style: GoogleFonts.poppins()),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: const Color.fromARGB(255, 33, 86, 57),
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: const Color.fromARGB(255, 50, 160, 99),
       body: SafeArea(
         child: Column(
           children: [
@@ -39,35 +39,48 @@ class _AState extends State<Account> {
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
             Text(
               'Siaberm@gmail.com',
-              style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey[700]),
+              style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
             ),
             SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {},
-              icon: Icon(Icons.edit),
+              icon: Icon(Icons.edit, color: Colors.white),
               label: Text("Edit Profile"),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
+                backgroundColor: Colors.white,
+                foregroundColor: const Color.fromARGB(255, 0, 0, 0),
               ),
             ),
             SizedBox(height: 30),
             ListTile(
-              leading: Icon(Icons.phone),
-              title: Text("Phone", style: GoogleFonts.poppins()),
-              subtitle: Text("+66 812345678", style: GoogleFonts.poppins()),
+              leading: Icon(Icons.phone, color: Colors.white),
+              title: Text(
+                "Phone",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
+              subtitle: Text(
+                "+66 812345678",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
             ),
             ListTile(
-              leading: Icon(Icons.cake),
-              title: Text("Birthday", style: GoogleFonts.poppins()),
-              subtitle: Text("January 1, 1990", style: GoogleFonts.poppins()),
+              leading: Icon(Icons.cake, color: Colors.white),
+              title: Text(
+                "Birthday",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
+              subtitle: Text(
+                "January 1, 1990",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
             ),
             Spacer(),
           ],

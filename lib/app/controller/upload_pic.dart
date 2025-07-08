@@ -1,10 +1,11 @@
 import 'dart:io';
-import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 
 class UploadImg {
   final ImagePicker imagePicker = ImagePicker();
-  final sendApi = GetConnect();
 
   Future<String> pickImage() async {
     final pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
@@ -15,31 +16,43 @@ class UploadImg {
     }
   }
 
+  Future<File> resizeImage(String imagePath, {int maxWidth = 800}) async {
+    final originalFile = File(imagePath);
+    final bytes = await originalFile.readAsBytes();
+    final image = img.decodeImage(bytes);
+
+    if (image == null) throw Exception("Cannot decode image");
+
+    // Resize → ลดขนาดแต่รักษาอัตราส่วน
+    final resized = img.copyResize(image, width: maxWidth);
+
+    // บันทึกไฟล์ใหม่ชั่วคราว
+    final tempDir = await getTemporaryDirectory();
+    final resizedPath = "${tempDir.path}/${tempDir.path.split("/").last}";
+    final resizedFile = File(resizedPath)
+      ..writeAsBytesSync(img.encodeJpg(resized, quality: 85));
+
+    return resizedFile;
+  }
+
   Future<String> uploadToCld(String imagePath) async {
-    final File? imgFile = File(imagePath);
-    if (imgFile == null) {
-      Get.snackbar("error", "cannot find img file");
-      return "No img";
-    } else {
-      final cldUrl = "https://api.cloudinary.com/v1_1/dzd7lt1ck/image/upload";
-      final imgData = MultipartFile(
-        imgFile,
-        filename: imagePath.split("/").last,
+    final File imgFile = await resizeImage(imagePath);
+    final imgData = FormData.fromMap({
+      "upload_preset": "allhallal_app",
+      "file": await MultipartFile.fromFile(imgFile.path),
+    });
+    try {
+      final res = await Dio().post(
+        "https://api.cloudinary.com/v1_1/dzd7lt1ck/image/upload",
+        data: imgData,
       );
-      try {
-        Response res = await sendApi.post(
-          cldUrl,
-          FormData({"upload_preset": "AllHalal", "file": imgData}),
-        );
-        print(res.body);
-        return res.body["secure_url"];
-      } catch (e) {
-        print(e);
-        Get.snackbar("error", "cannot upload");
-        return "";
-      } finally {
-        Get.snackbar("secess", "uploaded");
+      if (res.statusCode == 200) {
+        return res.data["secure_url"];
+      } else {
+        return "error";
       }
+    } catch (e) {
+      return "error";
     }
   }
 }

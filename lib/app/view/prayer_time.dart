@@ -183,7 +183,10 @@ class _PrayerTimeState extends State<PrayerTime>
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFFE57F), Color(0xFFFFC107)],
+            colors: [
+              const Color.fromARGB(255, 11, 101, 52),
+              const Color.fromARGB(255, 30, 16, 16),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
