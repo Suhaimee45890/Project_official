@@ -6,8 +6,8 @@ class Home extends StatelessWidget {
 
   String getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return "อัสสลามุอะลัยกุมตอนเช้า";
-    if (hour < 17) return "ยามบ่ายสุขสันต์";
+    if (hour < 12) return "อัสสลามุอะลัยกุมตอนเช้า ";
+    if (hour < 17) return "สุขสันต์ยามบ่าย";
     return "เย็นนี้อย่าลืมละหมาดมัฆริบ";
   }
 
@@ -67,7 +67,7 @@ class Home extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "Hi , $userName",
-          style: const TextStyle(
+          style: GoogleFonts.poppins(
             color: Colors.white,
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -110,7 +110,7 @@ class Home extends StatelessWidget {
             // 🟢 Greeting Text
             Text(
               getGreeting(),
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.notoSansThai(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: const Color.fromARGB(255, 11, 101, 52),

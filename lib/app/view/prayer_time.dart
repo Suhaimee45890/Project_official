@@ -109,13 +109,12 @@ class _PrayerTimeState extends State<PrayerTime> {
         setState(() {
           upcomingPrayer = name;
           timeToGo =
-              "${diff.inHours} hours and ${diff.inMinutes % 60} minutes to go";
+              "${diff.inHours} hours ${diff.inMinutes % 60} minutes to go";
         });
         return;
       }
     }
 
-    // Fallback to next day's Fajr if no prayer remains
     final nextFajr = prayerDateTime["Fajr"]!.add(const Duration(days: 1));
     final diff = nextFajr.difference(now);
     setState(() {
@@ -160,9 +159,9 @@ class _PrayerTimeState extends State<PrayerTime> {
         backgroundColor: const Color(0xFF1B5E20),
         elevation: 0,
         title: Text(
-          "Accurate Prayer Times",
-          style: GoogleFonts.poppins(
-            fontSize: 18,
+          "เวลาละหมาด",
+          style: GoogleFonts.sahitya(
+            fontSize: 25,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -178,7 +177,7 @@ class _PrayerTimeState extends State<PrayerTime> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 20,
+                    vertical: 5,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,65 +245,80 @@ class _PrayerTimeState extends State<PrayerTime> {
                     ],
                   ),
                 ),
+
+                // 🔔 PRAYER TIMES CONTAINER
                 Container(
                   margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 20,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFECFCD4), Color(0xFFFFFFFF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: const [
                       BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 12,
-                        offset: Offset(0, 6),
+                        color: Colors.black26,
+                        blurRadius: 14,
+                        offset: Offset(0, 8),
                       ),
                     ],
                   ),
                   child: Column(
                     children: times.entries.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.yellow.shade100,
-                                shape: BoxShape.circle,
-                              ),
-                              padding: const EdgeInsets.all(8),
-                              child: Icon(
-                                getPrayerIcon(entry.key),
-                                size: 22,
-                                color: Colors.amber.shade900,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                entry.key,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.shade100, // ✅ วงกลมไอคอน
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: const EdgeInsets.all(10),
+                                child: Icon(
+                                  getPrayerIcon(entry.key),
+                                  size: 24,
+                                  color: Colors.amber.shade800, // ✅ สีไอคอน
                                 ),
                               ),
-                            ),
-                            Text(
-                              entry.value,
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  entry.key,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF1B5E20),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                              Text(
+                                entry.value,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Divider(height: 20, thickness: 0.8),
+                        ],
                       );
                     }).toList(),
                   ),
                 ),
+
+                // 📣 NOTIFICATION SECTION
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 24,
+                    vertical: 0,
                   ),
                   child: Container(
                     padding: const EdgeInsets.all(16),
@@ -339,12 +353,7 @@ class _PrayerTimeState extends State<PrayerTime> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              255,
-                              255,
-                              255,
-                            ),
+                            backgroundColor: Colors.white,
                           ),
                           icon: const Icon(Icons.notifications_active),
                           label: const Text("Enable Prayer Alerts"),
