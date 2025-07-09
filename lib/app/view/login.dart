@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +22,16 @@ Future<void> login() async {
       email: emailController.text.trim(),
       password: passWordlController.text.trim(),
     );
-    Storage().saveData(user.user?.uid ?? "");
+    final uid = user.user?.uid ?? "";
+    final email = user.user?.email ?? "";
+    final userData = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .get();
+    final name = userData.data()?["name"] ?? "name not found";
+    final lastName = userData.data()?["lastname"] ?? "Last name not found ";
+    final birthday = userData.data()?["birthday"] ?? "birthday not found ";
+    Storage().saveData(uid, email, name, lastName, birthday);
     Get.offAllNamed("/frame");
   } on FirebaseException catch (e) {
     String message = "";

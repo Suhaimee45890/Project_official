@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Account extends StatefulWidget {
@@ -10,10 +9,6 @@ class Account extends StatefulWidget {
 }
 
 class _AState extends State<Account> {
-  // File? = _image ;
-  // String? _uploadedUrl ;
-  // final ImagePicker imagePicker = ImagePicker();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

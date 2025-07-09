@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ohochat_address/ohochat_address.dart' as address;
 import 'package:project_official/app/sevices/notifications.dart';
+import 'package:project_official/storage/storage.dart';
 
 class PrayerTime extends StatefulWidget {
   const PrayerTime({super.key});
@@ -17,7 +18,7 @@ class _PrayerTimeState extends State<PrayerTime> {
   late List<Map<String, String>> prayerTimesList = [];
   Position? pos;
   final notification = Notifications();
-
+  List<String> timeList = [];
   String location = "Loading...";
   String upcomingPrayer = "Loading...";
   String timeToGo = "";
@@ -81,6 +82,13 @@ class _PrayerTimeState extends State<PrayerTime> {
       'Maghrib': timings['Maghrib'],
       'Isha': timings['Isha'],
     });
+    timeList = [
+      timings['Fajr'],
+      timings['Dhuhr'],
+      timings['Asr'],
+      timings['Maghrib'],
+      timings['Isha'],
+    ];
 
     computeUpcomingPrayer(prayerTimesList[0]);
     setState(() {});
@@ -346,18 +354,48 @@ class _PrayerTimeState extends State<PrayerTime> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            notification.showNotification(
-                              "Next Prayer at: $upcomingPrayer",
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                          ),
-                          icon: const Icon(Icons.notifications_active),
-                          label: const Text("Enable Prayer Alerts"),
-                        ),
+                        Storage().isAlert()
+                            ? ElevatedButton.icon(
+                                onPressed: () {
+                                  notification.cancelNoti();
+                                  Get.snackbar(
+                                    "turn off",
+                                    "Alert has been TurnOff",
+                                  );
+                                  setState(() {
+                                    Storage().nonNoti();
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                ),
+                                icon: const Icon(
+                                  Icons.notifications_off,
+                                  color: Colors.red,
+                                ),
+                                label: const Text(
+                                  "Press to Turn Off Alert",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              )
+                            : ElevatedButton.icon(
+                                onPressed: () {
+                                  notification.showNotification(timeList);
+                                  Get.snackbar(
+                                    "turn on",
+                                    "Alert has been turn on",
+                                  );
+                                  print(timeList.toString());
+                                  setState(() {
+                                    Storage().setNoti();
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                ),
+                                icon: const Icon(Icons.notifications_active),
+                                label: const Text("Press to Turn On Alert"),
+                              ),
                       ],
                     ),
                   ),

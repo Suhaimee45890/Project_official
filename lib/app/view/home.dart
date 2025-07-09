@@ -40,7 +40,7 @@ class Home extends StatelessWidget {
         'title': 'มัสยิดใกล้เคียง',
         'subtitle': 'Coming Soon',
         'icon': Icons.location_on,
-        'route': "/nearbyMosqueMap",
+        'route': "/mosqueNearby",
       },
       {
         'title': 'ข่าวสาร/บทความ',
