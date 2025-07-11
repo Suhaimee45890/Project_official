@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,121 +12,97 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
-  bool isDarkMode = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white, // AppBar สีขาว
+        elevation: 1,
+        centerTitle: true,
         title: Text(
           'Settings',
-          style: GoogleFonts.poppins(color: Colors.white),
+          style: GoogleFonts.poppins(
+            color: Colors.black, // Text สีดำ
+            fontWeight: FontWeight.bold, // ตัวหนา
+            fontSize: 22,
+          ),
         ),
-        backgroundColor: const Color.fromARGB(255, 11, 101, 52),
-
-        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-        elevation: 0,
-        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black), // ปุ่ม back สีดำ
       ),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.all(20),
-          children: [
-            ListTile(
-              leading: Icon(Icons.language),
-              title: Text("Language", style: GoogleFonts.poppins()),
-              onTap: () {},
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSettingCard(
+                  icon: Icons.lock,
+                  title: "Privacy Policy",
+                  onTap: () {
+                    // TODO: ใส่หน้าหรือฟังก์ชันเมื่อกด
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildSettingCard(
+                  icon: Icons.info,
+                  title: "About App",
+                  onTap: () {
+                    // TODO: ใส่หน้าหรือฟังก์ชันเมื่อกด
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildSettingCard(
+                  icon: Icons.logout,
+                  title: "Logout",
+                  onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Storage().storageBox.remove("userId");
+                    Storage().storageBox.remove("isLogin");
+                    Get.offAllNamed("/");
+                  },
+                  color: Colors.white,
+                  iconColor: Colors.red.shade600,
+                  textColor: Colors.red.shade600,
+                ),
+              ],
             ),
-            ListTile(
-              leading: Icon(Icons.dark_mode),
-              title: Text("Dark Mode", style: GoogleFonts.poppins()),
-              trailing: Switch(
-                value: isDarkMode,
-                onChanged: (val) {
-                  setState(() {
-                    isDarkMode = val;
-                  });
-                  // ส่งค่าไปที่ ThemeProvider หรือใช้ callback
-                  // ในตัวอย่างนี้ใช้ simple approach: ThemeController (ดูด้านล่าง)
-                  ThemeSwitcher.of(context).changeTheme(val);
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.lock),
-              title: Text("Privacy Policy", style: GoogleFonts.poppins()),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.info),
-              title: Text("About App", style: GoogleFonts.poppins()),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text("Logout", style: GoogleFonts.poppins()),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Storage().storageBox.remove("userId");
-                Storage().storageBox.remove("isLogin");
-                Get.offAllNamed("/");
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
-}
 
-// Helper widget สำหรับเปลี่ยน Theme
-class ThemeSwitcher extends InheritedWidget {
-  final _ThemeSwitcherState data;
-
-  const ThemeSwitcher({super.key, required this.data, required super.child});
-
-  static _ThemeSwitcherState of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<ThemeSwitcher>()!.data;
-
-  @override
-  bool updateShouldNotify(ThemeSwitcher oldWidget) => true;
-}
-
-class ThemeController extends StatefulWidget {
-  final Widget child;
-
-  const ThemeController({super.key, required this.child});
-
-  @override
-  _ThemeSwitcherState createState() => _ThemeSwitcherState();
-}
-
-class _ThemeSwitcherState extends State<ThemeController> {
-  ThemeMode _themeMode = ThemeMode.light;
-
-  void changeTheme(bool isDark) {
-    setState(() {
-      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ThemeSwitcher(
-      data: this,
-      child: MaterialApp(
-        themeMode: _themeMode,
-        theme: ThemeData(
-          brightness: Brightness.light,
-          scaffoldBackgroundColor: Colors.grey.shade100,
-          appBarTheme: AppBarTheme(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+  Widget _buildSettingCard({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    Color color = Colors.white,
+    Color iconColor = Colors.black,
+    Color textColor = Colors.black,
+  }) {
+    return Card(
+      elevation: 3,
+      color: color,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        leading: Icon(icon, color: iconColor, size: 28),
+        title: Text(
+          title,
+          style: GoogleFonts.poppins(
+            color: textColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
           ),
         ),
-        darkTheme: ThemeData(brightness: Brightness.dark),
-        home: widget.child,
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.grey,
+        ),
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       ),
     );
   }
