@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class IslamicArticleDetailPage extends StatelessWidget {
-  final Map<String, String> article;
+  final QueryDocumentSnapshot<Map<String, dynamic>>? article;
 
   const IslamicArticleDetailPage({super.key, required this.article});
 
@@ -9,13 +10,13 @@ class IslamicArticleDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(article['title']!),
+        title: Text(article?['title']!),
         backgroundColor: Colors.teal,
       ),
       body: ListView(
         children: [
           Image.network(
-            article['image']!,
+            article?['image']!,
             height: 240,
             width: double.infinity,
             fit: BoxFit.cover,
@@ -26,7 +27,7 @@ class IslamicArticleDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  article['title']!,
+                  article?['title']!,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -34,12 +35,12 @@ class IslamicArticleDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  article['date']!,
+                  article?['date']!,
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  article['content']!,
+                  article?['content']!,
                   style: const TextStyle(fontSize: 16, height: 1.5),
                 ),
               ],

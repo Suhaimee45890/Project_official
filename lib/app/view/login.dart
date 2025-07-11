@@ -29,8 +29,8 @@ Future<void> login() async {
         .doc(uid)
         .get();
     final name = userData.data()?["name"] ?? "name not found";
-    final lastName = userData.data()?["lastname"] ?? "Last name not found ";
-    final birthday = userData.data()?["birthday"] ?? "birthday not found ";
+    final lastName = userData.data()?["lastname"] ?? "Last name not found";
+    final birthday = userData.data()?["dob"] ?? "birthday not found";
     Storage().saveData(uid, email, name, lastName, birthday);
     Get.offAllNamed("/frame");
   } on FirebaseException catch (e) {
@@ -78,7 +78,6 @@ class _LoginState extends State<Login> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-
         centerTitle: true,
       ),
       body: Stack(
@@ -88,23 +87,17 @@ class _LoginState extends State<Login> {
             child: Image.asset("assets/images/Login5.jpg", fit: BoxFit.cover),
           ),
           Container(color: const Color(0x90000000)),
-          SingleChildScrollView(
-            child: Padding(
+          Center(
+            child: SingleChildScrollView(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                top: 100,
                 left: 16,
                 right: 16,
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Center(
-                    child: Image.asset(
-                      "assets/images/appLogo1.png",
-                      width: 250,
-                    ),
-                  ),
+                  Image.asset("assets/images/appLogo1.png", width: 250),
                   const SizedBox(height: 30),
 
                   // Email
@@ -162,35 +155,6 @@ class _LoginState extends State<Login> {
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 20),
-
-                  // or continue with
-                  Text(
-                    "or continue with",
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Social Logins
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildSocialButton("assets/images/Google.jpg", () {
-                        login(); // หรือเพิ่มฟังก์ชัน Google Login
-                      }),
-                      const SizedBox(width: 15),
-                      _buildSocialButton("assets/images/X.jpeg", () {
-                        Get.toNamed("/");
-                      }),
-                      const SizedBox(width: 15),
-                      _buildSocialButton("assets/images/faceboook.jpg", () {
-                        Get.toNamed("/");
-                      }),
-                    ],
-                  ),
                   const SizedBox(height: 30),
 
                   // Register Link
@@ -218,16 +182,6 @@ class _LoginState extends State<Login> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSocialButton(String imagePath, VoidCallback onTap) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        onTap: onTap,
-        child: Image.asset(imagePath, width: 80, height: 80, fit: BoxFit.cover),
       ),
     );
   }

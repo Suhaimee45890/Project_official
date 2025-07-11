@@ -33,7 +33,6 @@ class _RegisterState extends State<Register> {
     }
 
     try {
-      // สร้างบัญชี Firebase Auth
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
             email: emailController.text.trim(),
@@ -42,7 +41,6 @@ class _RegisterState extends State<Register> {
 
       String uid = userCredential.user!.uid;
 
-      // บันทึกข้อมูลเพิ่มเติมลง Firestore
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'name': nameController.text.trim(),
         'lastname': lastnameController.text.trim(),
@@ -51,14 +49,12 @@ class _RegisterState extends State<Register> {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // ย้ายไปหน้า Home (Frame)
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Frame()),
       );
     } on FirebaseAuthException catch (e) {
       String message = "";
-
       if (e.code == 'email-already-in-use') {
         message = "อีเมลนี้ถูกใช้แล้ว";
       } else if (e.code == 'weak-password') {
@@ -66,24 +62,28 @@ class _RegisterState extends State<Register> {
       } else {
         message = e.message ?? "เกิดข้อผิดพลาด";
       }
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("เกิดข้อผิดพลาด")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("เกิดข้อผิดพลาด: ${e.toString()}")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final height = mediaQuery.size.height;
+    final width = mediaQuery.size.width;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16, top: 10, bottom: 8),
           child: Container(
@@ -101,8 +101,8 @@ class _RegisterState extends State<Register> {
       body: Stack(
         children: [
           Container(
-            height: double.infinity,
             width: double.infinity,
+            height: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -110,125 +110,93 @@ class _RegisterState extends State<Register> {
                   const Color.fromARGB(255, 30, 16, 16),
                 ],
                 begin: Alignment.topLeft,
-                end: Alignment.centerRight,
+                end: Alignment.bottomRight,
               ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: 150),
-              Center(
-                child: Text(
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: height * 0.12),
+                Text(
                   'Let’s Sign you in',
                   style: GoogleFonts.poppins(
-                    fontSize: 32,
+                    fontSize: width * 0.07,
                     fontWeight: FontWeight.bold,
                     color: Colors.yellow,
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Column(
-                  children: [
-                    Text(
-                      "ยินดีต้อนรับสู่ระบบของเรา ใช้บริการฟรี",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      "ทุกฟังก์ชั่น เพียงเข้าสู่ระบบตอนนี้",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      "แล้วเริ่มต้นการเดินทางฮาลาลของคุณ!",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 8),
+                Text(
+                  "ยินดีต้อนรับสู่ระบบของเรา ใช้บริการฟรี\nทุกฟังก์ชั่น เพียงเข้าสู่ระบบตอนนี้\nแล้วเริ่มต้นการเดินทางฮาลาลของคุณ!",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: width * 0.035,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 650,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.white, Color(0xFFD9D9D9)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
-                      ),
+                SizedBox(height: height * 0.05),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.white, Color(0xFFD9D9D9)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(50),
                     ),
                   ),
-                  Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 30),
-                          Text(
-                            "Register",
+                  child: Column(
+                    children: [
+                      Text(
+                        "Register",
+                        style: GoogleFonts.poppins(
+                          fontSize: width * 0.08,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      _buildTextField("Email", emailController),
+                      _buildTextField("Name", nameController),
+                      _buildTextField("Lastname", lastnameController),
+                      _buildPasswordField("Password", passwordController),
+                      _buildPasswordField(
+                        "Confirm Password",
+                        confirmPasswordController,
+                      ),
+                      _buildDateField(),
+                      SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: register,
+                          child: Text(
+                            "Sign In",
                             style: GoogleFonts.poppins(
-                              fontSize: 32,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           ),
-                          _buildTextField("Email", emailController),
-                          _buildTextField("Name", nameController),
-                          _buildTextField("Lastname", lastnameController),
-                          _buildPasswordField("Password", passwordController),
-                          _buildPasswordField(
-                            "Confirm Password",
-                            confirmPasswordController,
-                          ),
-                          _buildDateField(),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                            ),
-                            onPressed: register,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "Sign In",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 40),
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 20),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -237,7 +205,7 @@ class _RegisterState extends State<Register> {
 
   Widget _buildTextField(String label, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -252,7 +220,7 @@ class _RegisterState extends State<Register> {
 
   Widget _buildPasswordField(String hint, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: controller,
         obscureText: _obscureText,
@@ -276,7 +244,7 @@ class _RegisterState extends State<Register> {
 
   Widget _buildDateField() {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: _dobController,
         readOnly: true,

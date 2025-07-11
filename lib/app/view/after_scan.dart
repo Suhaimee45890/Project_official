@@ -17,24 +17,25 @@ class _AfterScanState extends State<AfterScan> {
 
   final String barcode = Get.arguments;
   bool isLoading = true;
-  bool message = false;
+  bool? isFound;
   String? name;
   bool? isHalal;
   String? image;
   bool halal = false;
-  bool? isFound;
   String? imagePath;
   bool upLoading = false;
 
   Future<void> checkFirebase(String barcode) async {
-    isLoading = true;
+    setState(() {
+      isLoading = true;
+    });
+
     DocumentSnapshot<Map<String, dynamic>> response = await FirebaseFirestore
         .instance
         .collection("products")
         .doc(barcode)
         .get();
 
-    // Get.snackbar("title", response.exists.toString());
     if (response.exists) {
       image = response["image"];
       name = response["name"];
@@ -43,132 +44,247 @@ class _AfterScanState extends State<AfterScan> {
     } else {
       isFound = false;
     }
-    isLoading = false;
 
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> addData() async {
-    final barcode = barcodeController.text;
+    final barcodeText = barcodeController.text;
     final cldUrl = await UploadImg().uploadToCld(imagePath!);
-    await FirebaseFirestore.instance.collection("products").doc(barcode).set({
-      "name": nameController.text,
-      "image": cldUrl,
-      "is_halal": halal,
-    });
+    await FirebaseFirestore.instance
+        .collection("products")
+        .doc(barcodeText)
+        .set({
+          "name": nameController.text.trim(),
+          "image": cldUrl,
+          "is_halal": halal,
+        });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    checkFirebase(barcode);
     nameController = TextEditingController();
-    barcodeController = TextEditingController();
-    barcodeController.text = barcode;
+    barcodeController = TextEditingController(text: barcode);
+    checkFirebase(barcode);
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    barcodeController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : isFound!
-        ? found()
-        : notFound();
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text("Loading...")),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    } else {
+      return isFound == true ? _buildFoundUI() : _buildNotFoundUI();
+    }
   }
 
-  Scaffold notFound() {
+  Widget _buildFoundUI() {
     return Scaffold(
-      appBar: AppBar(title: Text("Product not found")),
-      body: Center(
-        child: upLoading
-            ? CircularProgressIndicator()
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    imagePath == null
-                        ? ElevatedButton(
-                            onPressed: () async {
-                              imagePath = await UploadImg().pickImage();
-                              setState(() {});
-                            },
-                            child: Text("Upload Image"),
-                          )
-                        : Image.file(
-                            File(imagePath!),
-                            errorBuilder: (context, error, stackTrace) =>
-                                Icon(Icons.error_outline),
-                          ),
-                    TextField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        hint: Text("ใส่ชื่อ Product"),
-                      ),
-                    ),
-                    TextField(
-                      controller: barcodeController,
-                      decoration: InputDecoration(
-                        hint: Text(barcodeController.text),
-                      ),
-                    ),
-                    DropdownButton<bool>(
-                      value: halal,
-                      onChanged: (value) {
-                        setState(() {
-                          halal = value!;
-                        });
-                      },
-                      items: [
-                        DropdownMenuItem(value: true, child: Text("Halal")),
-                        DropdownMenuItem(value: false, child: Text("No")),
-                      ],
-                    ),
-                    if (imagePath != null)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Get.toNamed("/scanner");
-                            },
-                            child: Text("Cancle"),
-                          ),
-                          SizedBox(width: 16),
-                          ElevatedButton(
-                            onPressed: () async {
-                              setState(() {
-                                upLoading = true;
-                              });
-                              await addData();
-                              setState(() {
-                                upLoading = false;
-                              });
-                              Get.offNamed("/scanner");
-                            },
-                            child: Text("Upload"),
-                          ),
-                        ],
-                      ),
-                  ],
+      appBar: AppBar(title: const Text("Product Found")),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: image != null && image!.isNotEmpty
+                  ? Image.network(
+                      image!,
+                      height: 180,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.broken_image, size: 180),
+                    )
+                  : const Icon(Icons.image_not_supported, size: 180),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              name ?? 'Unknown Product',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "Barcode: $barcode",
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Halal Status: ", style: TextStyle(fontSize: 18)),
+                isHalal == true
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 28,
+                      )
+                    : const Icon(Icons.cancel, color: Colors.red, size: 28),
+              ],
+            ),
+            const Spacer(),
+            ElevatedButton.icon(
+              onPressed: () => Get.offNamed("/scanner"),
+              icon: const Icon(Icons.qr_code_scanner),
+              label: const Text("Scan Another Product"),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: const Color.fromARGB(255, 11, 101, 52),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Scaffold found() {
+  Widget _buildNotFoundUI() {
     return Scaffold(
-      appBar: AppBar(title: Text("Product found")),
-      body: Center(
+      appBar: AppBar(title: const Text("Product Not Found")),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Column(
           children: [
-            Image.network(
-              image ?? "",
-              errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+            imagePath == null
+                ? ElevatedButton.icon(
+                    icon: const Icon(Icons.upload_file),
+                    label: const Text("Upload Product Image"),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50),
+                      backgroundColor: const Color.fromARGB(255, 11, 101, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                      imagePath = await UploadImg().pickImage();
+                      setState(() {});
+                    },
+                  )
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      File(imagePath!),
+                      height: 180,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.broken_image, size: 180),
+                    ),
+                  ),
+            const SizedBox(height: 20),
+
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: "Product Name",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
             ),
-            Text(name ?? "name not found"),
-            Text(barcode),
-            Text(isHalal.toString()),
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: barcodeController,
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: "Barcode",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            DropdownButtonFormField<bool>(
+              value: halal,
+              decoration: InputDecoration(
+                labelText: "Halal Status",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+              items: const [
+                DropdownMenuItem(value: true, child: Text("Halal")),
+                DropdownMenuItem(value: false, child: Text("Non-Halal")),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  halal = value ?? false;
+                });
+              },
+            ),
+
+            const SizedBox(height: 30),
+
+            if (upLoading)
+              const CircularProgressIndicator()
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        minimumSize: const Size.fromHeight(50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () => Get.offNamed("/scanner"),
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        backgroundColor: const Color.fromARGB(255, 11, 101, 52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        setState(() {
+                          upLoading = true;
+                        });
+                        await addData();
+                        setState(() {
+                          upLoading = false;
+                        });
+                        Get.offNamed("/scanner");
+                      },
+                      child: const Text("Upload"),
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

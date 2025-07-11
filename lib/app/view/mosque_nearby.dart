@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MosqueNearbyLauncher extends StatelessWidget {
+class MosqueNearbyLauncher extends StatefulWidget {
   const MosqueNearbyLauncher({super.key});
 
+  @override
+  State<MosqueNearbyLauncher> createState() => _MosqueNearbyLauncherState();
+}
+
+class _MosqueNearbyLauncherState extends State<MosqueNearbyLauncher> {
   final String _googleMapsUrl =
       "https://www.google.com/maps/search/มัสยิดใกล้ฉัน";
 
@@ -18,6 +23,13 @@ class MosqueNearbyLauncher extends StatelessWidget {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _launchMaps();
   }
 
   @override

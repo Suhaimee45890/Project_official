@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_official/storage/storage.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String? imageUrl;
+  String userName = "Suhaimee"; // ตัวอย่างชื่อ user
+
+  @override
+  void initState() {
+    super.initState();
+    imageUrl = Storage().readSingleData("imageUrl");
+  }
 
   String getGreeting() {
     final hour = DateTime.now().hour;
@@ -13,10 +28,6 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String userName = "Suhaimee"; // ชื่อผู้ใช้
-    final String profileImageUrl =
-        "https://i.pravatar.cc/150?img=3"; // ลิงก์รูปโปรไฟล์ (เปลี่ยนตามจริงได้)
-
     final List<Map<String, dynamic>> services = [
       {
         'title': 'Halal Scanner',
@@ -37,28 +48,16 @@ class Home extends StatelessWidget {
         'route': '/compass',
       },
       {
-        'title': 'มัสยิดใกล้เคียง',
-        'subtitle': 'Coming Soon',
+        'title': 'Mosque Nearby',
+        'subtitle': 'มัสยิดใกล้เคียง',
         'icon': Icons.location_on,
         'route': "/mosqueNearby",
       },
       {
-        'title': 'ข่าวสาร/บทความ',
-        'subtitle': 'Coming Soon',
+        'title': 'News',
+        'subtitle': 'ข่าวสาร/บทความ',
         'icon': Icons.article,
         'route': "/islamicArticlesPage",
-      },
-      {
-        'title': 'ปฏิทินอิสลาม',
-        'subtitle': 'Coming Soon',
-        'icon': Icons.calendar_month,
-        'route': "/islamicCalendarPage",
-      },
-      {
-        'title': 'ส่งคำแนะนำ',
-        'subtitle': 'Feedback / ติดต่อเรา',
-        'icon': Icons.feedback,
-        'route': '/feedback',
       },
     ];
 
@@ -83,7 +82,17 @@ class Home extends StatelessWidget {
               padding: const EdgeInsets.only(right: 30),
               child: CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(profileImageUrl),
+                backgroundColor: Colors.grey.shade300,
+                backgroundImage: (imageUrl != null && imageUrl!.isNotEmpty)
+                    ? NetworkImage(imageUrl!)
+                    : null,
+                child: (imageUrl == null || imageUrl!.isEmpty)
+                    ? const Icon(
+                        Icons.account_circle,
+                        size: 40,
+                        color: Colors.grey,
+                      )
+                    : null,
               ),
             ),
           ),

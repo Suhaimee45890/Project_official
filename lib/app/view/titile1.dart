@@ -7,141 +7,112 @@ class Title1 extends StatefulWidget {
   const Title1({super.key});
 
   @override
-  State<Title1> createState() => _Title1();
+  State<Title1> createState() => _Title1State();
 }
 
-class _Title1 extends State<Title1> {
+class _Title1State extends State<Title1> {
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        // leading: IconButton(
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //   },
-        //   icon: Icon(Icons.arrow_back, color: Colors.white),
-        // ),
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Stack(
         children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
+          SizedBox(
+            height: size.height,
+            width: size.width,
             child: Image.asset("assets/images/Login5.jpg", fit: BoxFit.cover),
           ),
           Container(
-            height: double.infinity,
-            width: double.infinity,
-            color: Color(0x80000000),
+            height: size.height,
+            width: size.width,
+            color: Colors.black.withOpacity(0.5),
           ),
-          BarcodeScanner(),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    height: 400,
-                    width: double.infinity,
 
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color.fromARGB(255, 11, 101, 52),
-                          const Color.fromARGB(255, 30, 16, 16),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomLeft,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(40),
-                        topLeft: Radius.circular(40),
-                      ),
+          // Barcode scanner widget
+          const BarcodeScanner(),
+
+          // Bottom Panel
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 11, 101, 52),
+                    Color.fromARGB(255, 30, 16, 16),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomLeft,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "What you gonna do!",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
                     ),
                   ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 60),
-                        Text(
-                          "What you gonna do!",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Scan your Halal Product ?",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            // fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          "Check your Prayer Time ?",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            // fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          "Check The Qiblat ?",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            // fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        // Text(
-                        //   "scan your product !",
-                        //   textAlign: TextAlign.center,
-                        //   style: TextStyle(fontSize: 20, color: Colors.black),
-                        // ),
-                        SizedBox(height: 10),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(300, 60),
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              253,
-                              253,
-                              253,
-                            ),
-                          ),
-                          onPressed: () {
-                            Get.toNamed("/login"); // <-- ใช้ GetX
-                          },
-                          child: Text(
-                            "Let’s Start >",
-                            style: GoogleFonts.poppins(
-                              fontSize: 25,
-                              color: Colors.black,
-
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 18),
+                  Text(
+                    "Scan your Halal Product?",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "Check your Prayer Time?",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "Check The Qiblat?",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => Get.toNamed("/login"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      minimumSize: const Size(280, 55),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Let's Start >",
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ],
       ),
